@@ -26,6 +26,7 @@ namespace webScraper
             string url = @"https://www.discogs.com";
             //path url first page
             string urlPath = @"/search/?type=release";
+            
             for (int i = 0; i <= 3; i++)
             {
                 
@@ -55,12 +56,13 @@ namespace webScraper
                 }
 
                 //next page
-                urlPath = htmlDoc.DocumentNode
+               urlPath = htmlDoc.DocumentNode
                     .SelectSingleNode("//*[@id=\"pjax_container\"]/div[3]/form/div[1]/ul/li[2]/a")
                     .GetAttributeValue("href", "");
 
                 Console.WriteLine($"\n *** next page: {urlPath} *** \n");
             }
+            Console.WriteLine("done");
             Console.ReadLine();
         }
 
