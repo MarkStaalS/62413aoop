@@ -34,6 +34,8 @@ namespace webScraper
                 var html = await httpClient.GetStringAsync(url + urlPath);
                 var htmlDoc = new HtmlDocument();
                 htmlDoc.LoadHtml(html);
+                // try using IDisposable, maby by inhereting from the original class
+                //using ( HtmlDocument nd = new HtmlDocument)
 
                 //Using html atributes and nodes to get required information
                 //gets the part of the html document contaning the list
@@ -47,7 +49,7 @@ namespace webScraper
                     .Equals("search_result_title")).ToList();
                 //gets website links and then visits the website to get
                 //all relevant information for each item in our list above
-            
+                
                 foreach (var listItem in listItems)
                 {
                     string recordUrlPath = listItem.GetAttributeValue("href", "").ToString();
@@ -56,61 +58,48 @@ namespace webScraper
                 }
 
                 //next page
-               urlPath = htmlDoc.DocumentNode
-                    .SelectSingleNode("//*[@id=\"pjax_container\"]/div[3]/form/div[1]/ul/li[2]/a")
-                    .GetAttributeValue("href", "");
+                urlPath = getNextPage(htmlDoc);
 
                 Console.WriteLine($"\n *** next page: {urlPath} *** \n");
             }
             Console.WriteLine("done");
             Console.ReadLine();
         }
-
+        private static string getNextPage(HtmlDocument htmlDoc)
+        {
+            string urlPath;
+            urlPath = htmlDoc.DocumentNode
+                    .SelectSingleNode("//*[@id=\"pjax_container\"]/div[3]/form/div[1]/ul/li[2]/a")
+                    .GetAttributeValue("href", "");
+            return urlPath;
+        }
         private static (string genre, string imgUrl, string artist, string recordName) getRecordInfo(string url)
         {
             //scrape single record
+            (string genre, string imgUrl, string artist, string recordName) recordInfo;
             HtmlWeb web = new HtmlWeb();
             var htmlDoc = new HtmlDocument();
-            //Tuple
-            (string genre, string imgUrl, string artist, string recordName) recordInfo;
 
             try
             {
                 htmlDoc = web.Load(url);
+                recordInfo.genre = getGenre(htmlDoc);
+                recordInfo.imgUrl = getImgUrl(htmlDoc);
+                recordInfo.artist = getArtist(htmlDoc);
+                recordInfo.recordName = getRecordName(htmlDoc);
+
+                Console.WriteLine($"url: {recordInfo.imgUrl} \n" +
+                    $"record name: {recordInfo.recordName} \n" +
+                    $"artist: {recordInfo.artist} \n" +
+                    $"genre: {recordInfo.genre}\n");
+
+                return recordInfo;
             }
             catch (Exception)
             {
                 return (null, null, null, null);
             }
-
-            ////using node reference, could use xPath but thet would require further formating of the data
-            //var genre_ = htmlDoc.DocumentNode.Descendants("a")
-            //    .Where(node => node.GetAttributeValue("href", "")
-            //    .Contains("/genre/")).ToList();
-
-            ////Using xPath
-            //var pageContentNodes = htmlDoc.DocumentNode
-            //    .SelectSingleNode("//*[@id=\"page_content\"]/div[1]/div[1]/a")
-            //    .ChildNodes.ToList();
-            //string[] imgUrl_ = pageContentNodes[pageContentNodes.Count - 2].InnerHtml.Split('\"');
-            
-            //var profileTitleNodes = htmlDoc.DocumentNode
-            //    .SelectSingleNode("//*[@id=\"profile_title\"]")
-            //    .ChildNodes.ToList();
-
-            recordInfo.genre = getGenre(htmlDoc);
-            recordInfo.imgUrl = getImgUrl(htmlDoc);
-            recordInfo.artist = getArtist(htmlDoc);
-            recordInfo.recordName = getRecordName(htmlDoc);
-
-            Console.WriteLine($"url: {recordInfo.imgUrl} \n" +
-                $"record name: {recordInfo.recordName} \n" +
-                $"artist: {recordInfo.artist} \n" +
-                $"genre: {recordInfo.genre}\n");
-
-            return recordInfo;
         }
-
         private static string getGenre(HtmlDocument htmlDoc)
         {
             string genre;
