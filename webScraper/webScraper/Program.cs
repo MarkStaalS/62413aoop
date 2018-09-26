@@ -83,25 +83,25 @@ namespace webScraper
                 return (null, null, null, null);
             }
 
-            //using node reference, could use xPath but thet would require further formating of the data
-            var genre_ = htmlDoc.DocumentNode.Descendants("a")
-                .Where(node => node.GetAttributeValue("href", "")
-                .Contains("/genre/")).ToList();
+            ////using node reference, could use xPath but thet would require further formating of the data
+            //var genre_ = htmlDoc.DocumentNode.Descendants("a")
+            //    .Where(node => node.GetAttributeValue("href", "")
+            //    .Contains("/genre/")).ToList();
 
-            //Using xPath
-            var pageContentNodes = htmlDoc.DocumentNode
-                .SelectSingleNode("//*[@id=\"page_content\"]/div[1]/div[1]/a")
-                .ChildNodes.ToList();
-            string[] imgUrl_ = pageContentNodes[pageContentNodes.Count - 2].InnerHtml.Split('\"');
+            ////Using xPath
+            //var pageContentNodes = htmlDoc.DocumentNode
+            //    .SelectSingleNode("//*[@id=\"page_content\"]/div[1]/div[1]/a")
+            //    .ChildNodes.ToList();
+            //string[] imgUrl_ = pageContentNodes[pageContentNodes.Count - 2].InnerHtml.Split('\"');
             
-            var profileTitleNodes = htmlDoc.DocumentNode
-                .SelectSingleNode("//*[@id=\"profile_title\"]")
-                .ChildNodes.ToList();
+            //var profileTitleNodes = htmlDoc.DocumentNode
+            //    .SelectSingleNode("//*[@id=\"profile_title\"]")
+            //    .ChildNodes.ToList();
 
-            recordInfo.genre = genre_[0].InnerHtml;
-            recordInfo.imgUrl = imgUrl_[1];
-            recordInfo.artist = profileTitleNodes[1].InnerText.Trim();
-            recordInfo.recordName = profileTitleNodes.Last().InnerText.Trim();
+            recordInfo.genre = getGenre(htmlDoc);
+            recordInfo.imgUrl = getImgUrl(htmlDoc);
+            recordInfo.artist = getArtist(htmlDoc);
+            recordInfo.recordName = getRecordName(htmlDoc);
 
             Console.WriteLine($"url: {recordInfo.imgUrl} \n" +
                 $"record name: {recordInfo.recordName} \n" +
@@ -109,6 +109,46 @@ namespace webScraper
                 $"genre: {recordInfo.genre}\n");
 
             return recordInfo;
+        }
+
+        private static string getGenre(HtmlDocument htmlDoc)
+        {
+            string genre;
+            //using node reference, could use xPath but thet would require further formating of the data
+            var genre_ = htmlDoc.DocumentNode.Descendants("a")
+                .Where(node => node.GetAttributeValue("href", "")
+                .Contains("/genre/")).ToList();
+            genre = genre_[0].InnerHtml;
+            return genre;
+        }
+        private static string getImgUrl(HtmlDocument htmlDoc)
+        {
+            string imgUrl  ="";
+            //Using xPath
+            var pageContentNodes = htmlDoc.DocumentNode
+                .SelectSingleNode("//*[@id=\"page_content\"]/div[1]/div[1]/a")
+                .ChildNodes.ToList();
+            string[] imgUrl_ = pageContentNodes[pageContentNodes.Count - 2].InnerHtml.Split('\"');
+            imgUrl = imgUrl_[1]; ;
+            return imgUrl;
+        }
+        private static string getArtist(HtmlDocument htmlDoc)
+        {
+            string artist;
+            var profileTitleNodes = htmlDoc.DocumentNode
+                .SelectSingleNode("//*[@id=\"profile_title\"]")
+                .ChildNodes.ToList();
+            artist = profileTitleNodes[1].InnerText.Trim();
+            return artist;
+        }
+        private static string getRecordName(HtmlDocument htmlDoc)
+        {
+            string recordName;
+            var profileTitleNodes = htmlDoc.DocumentNode
+                .SelectSingleNode("//*[@id=\"profile_title\"]")
+                .ChildNodes.ToList();
+            recordName = profileTitleNodes.Last().InnerText.Trim();
+            return recordName;
         }
     }
 }
