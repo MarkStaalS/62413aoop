@@ -48,13 +48,16 @@ namespace webScraper
                     .Where(node => node.GetAttributeValue("class", "")
                     .Equals("search_result_title")).ToList();
                 //gets website links and then visits the website to get
-                //all relevant information for each item in our list above
-                
                 foreach (var listItem in listItems)
                 {
                     string recordUrlPath = listItem.GetAttributeValue("href", "").ToString();
                     //string recName = listItem.InnerHtml;
-                    Program.getRecordInfo(url + recordUrlPath);
+                    (string genre, string imgUrl, string artist, string recordTitle) recordInfo =
+                        Program.getRecordInfo(url + recordUrlPath);
+                    Console.WriteLine($"url: {recordInfo.imgUrl} \n" +
+                        $"record title: {recordInfo.recordTitle} \n" +
+                        $"artist: {recordInfo.artist} \n" +
+                        $"genre: {recordInfo.genre}\n");
                 }
 
                 //next page
@@ -65,6 +68,10 @@ namespace webScraper
             Console.WriteLine("done");
             Console.ReadLine();
         }
+        private static void printRecordInfo(string genre, string imgUrl, string artist, string recordTitle)
+        {
+            //******
+        }
         private static string getNextPage(HtmlDocument htmlDoc)
         {
             string urlPath;
@@ -73,10 +80,10 @@ namespace webScraper
                     .GetAttributeValue("href", "");
             return urlPath;
         }
-        private static (string genre, string imgUrl, string artist, string recordName) getRecordInfo(string url)
+        private static (string genre, string imgUrl, string artist, string recordTitle) getRecordInfo(string url)
         {
             //scrape single record
-            (string genre, string imgUrl, string artist, string recordName) recordInfo;
+            (string genre, string imgUrl, string artist, string recordTitle) recordInfo;
             HtmlWeb web = new HtmlWeb();
             var htmlDoc = new HtmlDocument();
 
@@ -86,13 +93,7 @@ namespace webScraper
                 recordInfo.genre = getGenre(htmlDoc);
                 recordInfo.imgUrl = getImgUrl(htmlDoc);
                 recordInfo.artist = getArtist(htmlDoc);
-                recordInfo.recordName = getRecordName(htmlDoc);
-
-                Console.WriteLine($"url: {recordInfo.imgUrl} \n" +
-                    $"record name: {recordInfo.recordName} \n" +
-                    $"artist: {recordInfo.artist} \n" +
-                    $"genre: {recordInfo.genre}\n");
-
+                recordInfo.recordTitle = getRecordTitle(htmlDoc);
                 return recordInfo;
             }
             catch (Exception)
@@ -130,14 +131,14 @@ namespace webScraper
             artist = profileTitleNodes[1].InnerText.Trim();
             return artist;
         }
-        private static string getRecordName(HtmlDocument htmlDoc)
+        private static string getRecordTitle(HtmlDocument htmlDoc)
         {
-            string recordName;
+            string recordTitle;
             var profileTitleNodes = htmlDoc.DocumentNode
                 .SelectSingleNode("//*[@id=\"profile_title\"]")
                 .ChildNodes.ToList();
-            recordName = profileTitleNodes.Last().InnerText.Trim();
-            return recordName;
+            recordTitle = profileTitleNodes.Last().InnerText.Trim();
+            return recordTitle;
         }
     }
 }
