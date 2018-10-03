@@ -17,7 +17,8 @@ namespace webScraper
             getHtmlAsync();
             Console.ReadLine();
         }
-
+        // html siden = et objekt
+        // hvert element i htm listen et objekt
         private static async void getHtmlAsync()
         {
             //webScraper
@@ -82,6 +83,8 @@ namespace webScraper
                     .GetAttributeValue("href", "");
             return urlPath;
         }
+        // laves som objekt i en anden klasse
+        // mange objekter
         private static (string genre, string imgUrl, string artist, string recordTitle) getRecordInfo(string url)
         {
             //scrape single record
