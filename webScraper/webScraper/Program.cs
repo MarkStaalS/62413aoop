@@ -51,15 +51,14 @@ namespace webScraper
                 foreach (var listItem in listItems)
                 {
                     string recordUrlPath = listItem.GetAttributeValue("href", "").ToString();
-                    //string recName = listItem.InnerHtml;
                     (string genre, string imgUrl, string artist, string recordTitle) recordInfo =
                         Program.getRecordInfo(url + recordUrlPath);
-                    Console.WriteLine($"url: {recordInfo.imgUrl} \n" +
-                        $"record title: {recordInfo.recordTitle} \n" +
-                        $"artist: {recordInfo.artist} \n" +
-                        $"genre: {recordInfo.genre}\n");
-                }
 
+                    printRecordInfo(recordInfo.imgUrl,
+                        recordInfo.recordTitle,
+                        recordInfo.artist,
+                        recordInfo.genre);
+                }
                 //next page
                 urlPath = getNextPage(htmlDoc);
 
@@ -70,7 +69,10 @@ namespace webScraper
         }
         private static void printRecordInfo(string genre, string imgUrl, string artist, string recordTitle)
         {
-            //******
+            Console.WriteLine($"url: {imgUrl} \n" +
+                        $"record title: {recordTitle} \n" +
+                        $"artist: {artist} \n" +
+                        $"genre: {genre}\n");
         }
         private static string getNextPage(HtmlDocument htmlDoc)
         {
