@@ -54,11 +54,17 @@ namespace webScraper
                     string recordUrlPath = listItem.GetAttributeValue("href", "").ToString();
                     (string genre, string imgUrl, string artist, string recordTitle) recordInfo =
                         Program.getRecordInfo(url + recordUrlPath);
-
-                    printRecordInfo(recordInfo.imgUrl,
-                        recordInfo.recordTitle,
-                        recordInfo.artist,
-                        recordInfo.genre);
+                    if (recordInfo.genre == null)
+                    {
+                        Console.WriteLine("Error\n");
+                    }  
+                    else
+                    {
+                        printRecordInfo(recordInfo.genre,
+                            recordInfo.imgUrl,
+                            recordInfo.artist,
+                            recordInfo.recordTitle);
+                    }
                 }
                 //next page
                 urlPath = getNextPage(htmlDoc);
@@ -142,7 +148,7 @@ namespace webScraper
             var profileTitleNodes = htmlDoc.DocumentNode
                 .SelectSingleNode("//*[@id=\"profile_title\"]")
                 .ChildNodes.ToList();
-            recordTitle = profileTitleNodes.Last().InnerText.Trim();
+            recordTitle = profileTitleNodes[profileTitleNodes.Count-2].InnerText.Trim();
             return recordTitle;
         }
     }
