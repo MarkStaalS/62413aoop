@@ -17,8 +17,7 @@ namespace webScraper
             getHtmlAsync();
             Console.ReadLine();
         }
-        // html siden = et objekt
-        // hvert element i htm listen et objekt
+
         private static async void getHtmlAsync()
         {
             //webScraper
@@ -27,7 +26,7 @@ namespace webScraper
             string url = @"https://www.discogs.com";
             //path url first page
             string urlPath = @"/search/?type=release";
-            
+            int ctr = 0;
             for (int i = 0; i <= 3; i++)
             {
                 
@@ -60,6 +59,7 @@ namespace webScraper
                     }  
                     else
                     {
+                        ctr++;
                         printRecordInfo(recordInfo.genre,
                             recordInfo.imgUrl,
                             recordInfo.artist,
@@ -69,7 +69,7 @@ namespace webScraper
                 //next page
                 urlPath = getNextPage(htmlDoc);
 
-                Console.WriteLine($"\n *** next page: {urlPath} *** \n");
+                Console.WriteLine($"\n *** next page: {urlPath} count:{ctr}*** \n");
             }
             Console.WriteLine("done");
             Console.ReadLine();
@@ -89,23 +89,20 @@ namespace webScraper
                     .GetAttributeValue("href", "");
             return urlPath;
         }
-        // laves som objekt i en anden klasse
-        // mange objekter
+
         private static (string genre, string imgUrl, string artist, string recordTitle) getRecordInfo(string url)
         {
             //scrape single record
-            (string genre, string imgUrl, string artist, string recordTitle) recordInfo;
             HtmlWeb web = new HtmlWeb();
             var htmlDoc = new HtmlDocument();
 
             try
             {
                 htmlDoc = web.Load(url);
-                recordInfo.genre = getGenre(htmlDoc);
-                recordInfo.imgUrl = getImgUrl(htmlDoc);
-                recordInfo.artist = getArtist(htmlDoc);
-                recordInfo.recordTitle = getRecordTitle(htmlDoc);
-                return recordInfo;
+                return (getGenre(htmlDoc),
+                    getImgUrl(htmlDoc), 
+                    getArtist(htmlDoc), 
+                    getRecordTitle(htmlDoc));
             }
             catch (Exception)
             {
@@ -114,42 +111,32 @@ namespace webScraper
         }
         private static string getGenre(HtmlDocument htmlDoc)
         {
-            string genre;
-            //using node reference, could use xPath but thet would require further formating of the data
             var genre_ = htmlDoc.DocumentNode.Descendants("a")
                 .Where(node => node.GetAttributeValue("href", "")
                 .Contains("/genre/")).ToList();
-            genre = genre_[0].InnerHtml;
-            return genre;
+            return genre_[0].InnerHtml;
         }
         private static string getImgUrl(HtmlDocument htmlDoc)
         {
-            string imgUrl  ="";
-            //Using xPath
             var pageContentNodes = htmlDoc.DocumentNode
                 .SelectSingleNode("//*[@id=\"page_content\"]/div[1]/div[1]/a")
                 .ChildNodes.ToList();
             string[] imgUrl_ = pageContentNodes[pageContentNodes.Count - 2].InnerHtml.Split('\"');
-            imgUrl = imgUrl_[1]; ;
-            return imgUrl;
+            return imgUrl_[1];
         }
         private static string getArtist(HtmlDocument htmlDoc)
         {
-            string artist;
             var profileTitleNodes = htmlDoc.DocumentNode
                 .SelectSingleNode("//*[@id=\"profile_title\"]")
                 .ChildNodes.ToList();
-            artist = profileTitleNodes[1].InnerText.Trim();
-            return artist;
+            return profileTitleNodes[1].InnerText.Trim();
         }
         private static string getRecordTitle(HtmlDocument htmlDoc)
         {
-            string recordTitle;
             var profileTitleNodes = htmlDoc.DocumentNode
                 .SelectSingleNode("//*[@id=\"profile_title\"]")
                 .ChildNodes.ToList();
-            recordTitle = profileTitleNodes[profileTitleNodes.Count-2].InnerText.Trim();
-            return recordTitle;
+            return profileTitleNodes[profileTitleNodes.Count - 2].InnerText.Trim();
         }
     }
 }
