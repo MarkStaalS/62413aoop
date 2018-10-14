@@ -9,7 +9,6 @@ using System.Net.Http;
 using System.Net;
 using System.IO;
 
-
 namespace webScraper
 {
     class Program
@@ -19,7 +18,6 @@ namespace webScraper
             getHtmlAsync();
             Console.ReadLine();
         }
-
         private static async void getHtmlAsync()
         {
             //webScraper
@@ -29,63 +27,58 @@ namespace webScraper
             //path url first page
             string urlPath = @"/search/?type=release";
             int ctr = 0;
-            using (System.IO.StreamWriter file =
-                new System.IO.StreamWriter(@"C:\Users\ham-d\Desktop\tst.txt", true))
+            int maxCtr = 5;
+            while (ctr < maxCtr)
             {
 
-                for (int i = 0; i <= 1; i++)
+                var httpClient = new HttpClient();
+                var html = await httpClient.GetStringAsync(url + urlPath);
+                var htmlDoc = new HtmlDocument();
+                htmlDoc.LoadHtml(html);
+                // try using IDisposable, maby by inhereting from the original class
+                //using ( HtmlDocument nd = new HtmlDocument)
+
+                //Using html atributes and nodes to get required information
+                //gets the part of the html document contaning the list
+                var recordList = htmlDoc.DocumentNode.Descendants("div")
+                    .Where(node => node.GetAttributeValue("id", "")
+                    .Equals("search_results")).ToList();
+                //divides the above section into bits for each record and puts 
+                //them in a list
+                var listItems = recordList[0].Descendants("a")
+                    .Where(node => node.GetAttributeValue("class", "")
+                    .Equals("search_result_title")).ToList();
+                //gets website links and then visits the website to get
+                foreach (var listItem in listItems)
                 {
+                    if (ctr >= maxCtr)
+                        break;
 
-                    var httpClient = new HttpClient();
-                    var html = await httpClient.GetStringAsync(url + urlPath);
-                    var htmlDoc = new HtmlDocument();
-                    htmlDoc.LoadHtml(html);
-                    // try using IDisposable, maby by inhereting from the original class
-                    //using ( HtmlDocument nd = new HtmlDocument)
-
-                    //Using html atributes and nodes to get required information
-                    //gets the part of the html document contaning the list
-                    var recordList = htmlDoc.DocumentNode.Descendants("div")
-                        .Where(node => node.GetAttributeValue("id", "")
-                        .Equals("search_results")).ToList();
-                    //divides the above section into bits for each record and puts 
-                    //them in a list
-                    var listItems = recordList[0].Descendants("a")
-                        .Where(node => node.GetAttributeValue("class", "")
-                        .Equals("search_result_title")).ToList();
-                    //gets website links and then visits the website to get
-                    foreach (var listItem in listItems)
+                    string recordUrlPath = listItem.GetAttributeValue("href", "").ToString();
+                    (string genre, string imgUrl, string artist, string recordTitle) recordInfo =
+                        Program.getRecordInfo(url + recordUrlPath);
+                    if (recordInfo.genre == null || recordInfo.imgUrl == "thumbnail_border")
                     {
-                        string recordUrlPath = listItem.GetAttributeValue("href", "").ToString();
-                        (string genre, string imgUrl, string artist, string recordTitle) recordInfo =
-                            Program.getRecordInfo(url + recordUrlPath);
-                        if (recordInfo.genre == null || recordInfo.imgUrl == "thumbnail_border")
-                        {
-                            Console.WriteLine("Error\n");
-                        }
-                        else
-                        {
-                            //file.WriteLine("");
-                            //file.WriteLine(recordInfo.recordTitle);
-                            //file.WriteLine(recordInfo.artist);
-                            //file.WriteLine(recordInfo.genre);
-                            //file.WriteLine(recordInfo.imgUrl); 
-                            ctr++;
-                            //printRecordInfo(recordInfo.genre,
-                            //    recordInfo.imgUrl,
-                            //    recordInfo.artist,
-                            //    recordInfo.recordTitle);
-                        }
+                        Console.WriteLine("Error\n");
                     }
-                    //next page
-                    urlPath = getNextPage(htmlDoc);
-
-                    Console.WriteLine($"\n *** next page: {urlPath} count:{ctr}*** \n");
+                    else
+                    {
+                        ctr++;
+                        printRecordInfo(recordInfo.genre,
+                            recordInfo.imgUrl,
+                            recordInfo.artist,
+                            recordInfo.recordTitle);
+                    }
                 }
+                //next page
+                urlPath = getNextPage(htmlDoc);
+
+                Console.WriteLine($"\n *** next page: {urlPath} count:{ctr}*** \n");
             }
             Console.WriteLine("done");
             Console.ReadLine();
         }
+
         private static void printRecordInfo(string genre, string imgUrl, string artist, string recordTitle)
         {
             Console.WriteLine($"url: {imgUrl} \n" +
