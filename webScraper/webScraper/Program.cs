@@ -20,12 +20,13 @@ namespace webScraper
     {
         static void Main(string[] args)
         {
-            recordsDAL rec = new recordsDAL();
-            rec.InsertRecord("1", "1", "Punk", "1", "1");
-            Console.ReadLine();
+            //recordsDAL rec = new recordsDAL();
+            //rec.ResetDatabase();
+            getHtml();
+            //Console.ReadLine();
         }
 
-        private static async void getHtmlAsync()
+        private static void getHtml()
         {
             //webScraper
             // scrapes website and gets record information and link to image
@@ -33,19 +34,14 @@ namespace webScraper
             string url = @"https://www.discogs.com";
             //path url first page
             string urlPath = @"/search/?type=release";
+
+            recordsDAL rec = new recordsDAL();
             int ctr = 0;
             int maxCtr = 5;
             while (ctr < maxCtr)
             {
-                var htmlDoc = new HtmlDocument();
-                using (var httpClient = new HttpClient())
-                {
-                    var html = await httpClient.GetStringAsync(url + urlPath);
-                    htmlDoc.LoadHtml(html);
-                }
-                
-                // try using IDisposable, maby by inhereting from the original class
-                //using ( HtmlDocument nd = new HtmlDocument)
+                HtmlWeb web = new HtmlWeb();
+                HtmlDocument htmlDoc = web.Load(url + urlPath);
 
                 //Using html atributes and nodes to get required information
                 //gets the part of the html document contaning the list
@@ -73,10 +69,17 @@ namespace webScraper
                     else
                     {
                         ctr++;
+
                         printRecordInfo(recordInfo.genre,
                             recordInfo.imgUrl,
                             recordInfo.artist,
                             recordInfo.recordTitle);
+
+                        rec.InsertRecord(recordInfo.recordTitle,
+                            recordInfo.artist,
+                            recordInfo.genre,
+                            "recordInfo.imgUrl",
+                            "pathUrl");
                     }
                 }
                 //next page

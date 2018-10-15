@@ -1,8 +1,6 @@
 ﻿using System.Data;
 using System.Configuration;
 using System.Data.SqlClient;
-using webScraper.Models;
-using System;
 
 namespace webScraper.DataOperations
 {
@@ -32,9 +30,50 @@ namespace webScraper.DataOperations
             string sql = "INSERT INTO records" +
                 "(recordName,recordArtist,recordGenre,recordUrl,recordPathUrl)" +
                 "Values" +
-                $"('{name}','{artist}','{genre}','{url}','{pathUrl}')";
+                "(@name, @artist, @genre, @url, @pathUrl)";
+
             using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
             {
+                SqlParameter parameter = new SqlParameter
+                {
+                    ParameterName = "@name",
+                    Value = name,
+                    SqlDbType = SqlDbType.Char
+                };
+                cmd.Parameters.Add(parameter);
+
+                parameter = new SqlParameter
+                {
+                    ParameterName = "@artist",
+                    Value = artist,
+                    SqlDbType = SqlDbType.Char
+                };
+                cmd.Parameters.Add(parameter);
+
+                parameter = new SqlParameter
+                {
+                    ParameterName = "@genre",
+                    Value = genre,
+                    SqlDbType = SqlDbType.Char
+                };
+                cmd.Parameters.Add(parameter);
+
+                parameter = new SqlParameter
+                {
+                    ParameterName = "@url",
+                    Value = url,
+                    SqlDbType = SqlDbType.Char
+                };
+                cmd.Parameters.Add(parameter);
+
+                parameter = new SqlParameter
+                {
+                    ParameterName = "@pathUrl",
+                    Value = pathUrl,
+                    SqlDbType = SqlDbType.Char
+                };
+                cmd.Parameters.Add(parameter);
+
                 cmd.CommandType = CommandType.Text;
                 cmd.ExecuteNonQuery();
             }
@@ -65,6 +104,31 @@ namespace webScraper.DataOperations
                     cmd.ExecuteNonQuery();
                 }
             }
+        }
+        public void ResetDatabase()
+        {
+            OpenConnection();
+            //Deletes rows from tables
+            string sql = "DELETE FROM records";
+            using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
+            {
+                cmd.CommandType = CommandType.Text;
+                cmd.ExecuteNonQuery();
+            }
+            //Resets id for records
+            sql = "DBCC CHECKIDENT('records', RESEED, 0)";
+            using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
+            {
+                cmd.CommandType = CommandType.Text;
+                cmd.ExecuteNonQuery();
+            }
+            sql = "DELETE FROM genre";
+            using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
+            {
+                cmd.CommandType = CommandType.Text;
+                cmd.ExecuteNonQuery();
+            }
+            CloseConnection();
         }
     }
 }
