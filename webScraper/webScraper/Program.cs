@@ -11,6 +11,7 @@ using System.IO;
 using System.Data;
 using System.Data.Common;
 using System.Configuration;
+using System.Data.SqlClient;
 
 namespace webScraper
 {
@@ -19,32 +20,55 @@ namespace webScraper
         static void Main(string[] args)
         {
             //getHtmlAsync();
+            //should be able to deal with other computers/ users
 
             // Get Connection string/provider from *.config
-            string dataProvider =
-                ConfigurationManager.AppSettings["provider"];
-            string connectionString =
-                ConfigurationManager.AppSettings["connectionString"];
-            //Get factory provider
-            DbProviderFactory factory = DbProviderFactories.GetFactory(dataProvider);
+            //string dataProvider =
+            //    ConfigurationManager.AppSettings["provider"];
+            //string connectionString =
+            //    ConfigurationManager.AppSettings["connectionString"];
+            ////Get factory provider
+            //DbProviderFactory factory = DbProviderFactories.GetFactory(dataProvider);
 
-            //Get connection object
-            using (DbConnection connection = factory.CreateConnection())
+            ////Get connection object
+            //using (DbConnection connection = factory.CreateConnection())
+            //{
+            //    connection.ConnectionString = connectionString;
+            //    connection.Open();
+            //    DbCommand command = factory.CreateCommand();
+            //    command.Connection = connection;
+            //    command.CommandText = "SELECT * FROM records";
+            //    using (DbDataReader dataReader = command.ExecuteReader())
+            //    {
+            //        while (dataReader.Read())
+            //            Console.WriteLine($"record name{dataReader["recordName"]} record artist{dataReader["recordArtist"]}");
+            //    }
+            //}
+
+
+            using (SqlConnection connection = new SqlConnection())
             {
-                if (connection == null)
-                {
-                    Console.WriteLine("Error Connection");
-                    return;
-                }
-                connection.ConnectionString = connectionString;
+                connection.ConnectionString =
+                    ConfigurationManager.AppSettings["connectionString"];
                 connection.Open();
-                DbCommand command = factory.CreateCommand();
-                command.Connection = connection;
-                command.CommandText = "SELECT * FROM records";
-                using (DbDataReader dataReader = command.ExecuteReader())
+                string sql = "SELECT * FROM records";
+                using (SqlCommand cmd = new SqlCommand(sql, connection))
                 {
-                    while(dataReader.Read())
-                        Console.WriteLine($"record name{dataReader["recordName"]} record artist{dataReader["recordArtist"]}");
+                    using (SqlDataReader dataReader = cmd.ExecuteReader())
+                    {
+                        while (dataReader.Read())
+                        {
+                            Console.WriteLine($"record name{dataReader["recordName"]} record artist{dataReader["recordArtist"]}");
+                        }
+                    }
+                }
+                sql = "INSERT INTO records" +
+                    "(recordName,recordGenre,recordArtist,recordPathUrl,recordUrl)" +
+                    "Values('name','rock','artist','1','2')";
+                using ( SqlCommand cmd = new SqlCommand(sql, connection))
+                {
+                    cmd.CommandType = CommandType.Text;
+                    cmd.ExecuteNonQuery();
                 }
             }
             Console.ReadLine();
