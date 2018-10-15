@@ -8,6 +8,9 @@ using System.Xml;
 using System.Net.Http;
 using System.Net;
 using System.IO;
+using System.Data;
+using System.Data.Common;
+using System.Configuration;
 
 namespace webScraper
 {
@@ -15,7 +18,35 @@ namespace webScraper
     {
         static void Main(string[] args)
         {
-            getHtmlAsync();
+            //getHtmlAsync();
+
+            // Get Connection string/provider from *.config
+            string dataProvider =
+                ConfigurationManager.AppSettings["provider"];
+            string connectionString =
+                ConfigurationManager.AppSettings["connectionString"];
+            //Get factory provider
+            DbProviderFactory factory = DbProviderFactories.GetFactory(dataProvider);
+
+            //Get connection object
+            using (DbConnection connection = factory.CreateConnection())
+            {
+                if (connection == null)
+                {
+                    Console.WriteLine("Error Connection");
+                    return;
+                }
+                connection.ConnectionString = connectionString;
+                connection.Open();
+                DbCommand command = factory.CreateCommand();
+                command.Connection = connection;
+                command.CommandText = "SELECT * FROM records";
+                using (DbDataReader dataReader = command.ExecuteReader())
+                {
+                    while(dataReader.Read())
+                        Console.WriteLine($"record name{dataReader["recordName"]} record artist{dataReader["recordArtist"]}");
+                }
+            }
             Console.ReadLine();
         }
         private static async void getHtmlAsync()
@@ -30,11 +61,13 @@ namespace webScraper
             int maxCtr = 5;
             while (ctr < maxCtr)
             {
-
-                var httpClient = new HttpClient();
-                var html = await httpClient.GetStringAsync(url + urlPath);
                 var htmlDoc = new HtmlDocument();
-                htmlDoc.LoadHtml(html);
+                using (var httpClient = new HttpClient())
+                {
+                    var html = await httpClient.GetStringAsync(url + urlPath);
+                    htmlDoc.LoadHtml(html);
+                }
+                
                 // try using IDisposable, maby by inhereting from the original class
                 //using ( HtmlDocument nd = new HtmlDocument)
 
