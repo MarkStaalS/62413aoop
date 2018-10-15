@@ -20,52 +20,10 @@ namespace webScraper
     {
         static void Main(string[] args)
         {
-            //using (SqlConnection connection = new SqlConnection())
-            //{
-            //    connection.ConnectionString =
-            //        ConfigurationManager.AppSettings["connectionString"];
-            //    connection.Open();
-            //    string sql = "SELECT * FROM records";
-            //    using (SqlCommand cmd = new SqlCommand(sql, connection))
-            //    {
-            //        using (SqlDataReader dataReader = cmd.ExecuteReader())
-            //        {
-            //            while (dataReader.Read())
-            //            {
-            //                Console.WriteLine($"record name{dataReader["recordName"]} record artist{dataReader["recordArtist"]}");
-            //            }
-            //        }
-            //    }
-            //    sql = "INSERT INTO records" +
-            //        "(recordName,recordGenre,recordArtist,recordPathUrl,recordUrl)" +
-            //        "Values('name','rock','artist','1','2')";
-            //    using (SqlCommand cmd = new SqlCommand(sql, connection))
-            //    {
-            //        cmd.CommandType = CommandType.Text;
-            //        cmd.ExecuteNonQuery();
-            //    }
-            //}
             recordsDAL rec = new recordsDAL();
-            rec.InsertRecord("1", "1", "Rock", "1", "1");
+            rec.InsertRecord("1", "1", "Punk", "1", "1");
             Console.ReadLine();
         }
-        //private SqlConnection _SqlConnection = null;
-        //private readonly string _connectionString = ConfigurationManager.AppSettings["connectionString"];
-        //private void OpenConnection()
-        //{
-        //    _SqlConnection = new SqlConnection()
-        //    {
-        //        ConnectionString = _connectionString
-        //    };
-        //    _SqlConnection.Open();
-        //}
-        //private void CloseConnection()
-        //{
-        //    if(_SqlConnection?.State != ConnectionState.Closed)
-        //    {
-        //        _SqlConnection?.Close();
-        //    }
-        //}
 
         private static async void getHtmlAsync()
         {
@@ -129,7 +87,6 @@ namespace webScraper
             Console.WriteLine("done");
             Console.ReadLine();
         }
-
         private static void printRecordInfo(string genre, string imgUrl, string artist, string recordTitle)
         {
             Console.WriteLine($"url: {imgUrl} \n" +
