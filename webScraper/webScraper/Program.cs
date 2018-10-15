@@ -12,6 +12,7 @@ using System.Data;
 using System.Data.Common;
 using System.Configuration;
 using System.Data.SqlClient;
+using webScraper.DataOperations;
 
 namespace webScraper
 {
@@ -19,60 +20,53 @@ namespace webScraper
     {
         static void Main(string[] args)
         {
-            //getHtmlAsync();
-            //should be able to deal with other computers/ users
-
-            // Get Connection string/provider from *.config
-            //string dataProvider =
-            //    ConfigurationManager.AppSettings["provider"];
-            //string connectionString =
-            //    ConfigurationManager.AppSettings["connectionString"];
-            ////Get factory provider
-            //DbProviderFactory factory = DbProviderFactories.GetFactory(dataProvider);
-
-            ////Get connection object
-            //using (DbConnection connection = factory.CreateConnection())
+            //using (SqlConnection connection = new SqlConnection())
             //{
-            //    connection.ConnectionString = connectionString;
+            //    connection.ConnectionString =
+            //        ConfigurationManager.AppSettings["connectionString"];
             //    connection.Open();
-            //    DbCommand command = factory.CreateCommand();
-            //    command.Connection = connection;
-            //    command.CommandText = "SELECT * FROM records";
-            //    using (DbDataReader dataReader = command.ExecuteReader())
+            //    string sql = "SELECT * FROM records";
+            //    using (SqlCommand cmd = new SqlCommand(sql, connection))
             //    {
-            //        while (dataReader.Read())
-            //            Console.WriteLine($"record name{dataReader["recordName"]} record artist{dataReader["recordArtist"]}");
+            //        using (SqlDataReader dataReader = cmd.ExecuteReader())
+            //        {
+            //            while (dataReader.Read())
+            //            {
+            //                Console.WriteLine($"record name{dataReader["recordName"]} record artist{dataReader["recordArtist"]}");
+            //            }
+            //        }
+            //    }
+            //    sql = "INSERT INTO records" +
+            //        "(recordName,recordGenre,recordArtist,recordPathUrl,recordUrl)" +
+            //        "Values('name','rock','artist','1','2')";
+            //    using (SqlCommand cmd = new SqlCommand(sql, connection))
+            //    {
+            //        cmd.CommandType = CommandType.Text;
+            //        cmd.ExecuteNonQuery();
             //    }
             //}
-
-
-            using (SqlConnection connection = new SqlConnection())
-            {
-                connection.ConnectionString =
-                    ConfigurationManager.AppSettings["connectionString"];
-                connection.Open();
-                string sql = "SELECT * FROM records";
-                using (SqlCommand cmd = new SqlCommand(sql, connection))
-                {
-                    using (SqlDataReader dataReader = cmd.ExecuteReader())
-                    {
-                        while (dataReader.Read())
-                        {
-                            Console.WriteLine($"record name{dataReader["recordName"]} record artist{dataReader["recordArtist"]}");
-                        }
-                    }
-                }
-                sql = "INSERT INTO records" +
-                    "(recordName,recordGenre,recordArtist,recordPathUrl,recordUrl)" +
-                    "Values('name','rock','artist','1','2')";
-                using ( SqlCommand cmd = new SqlCommand(sql, connection))
-                {
-                    cmd.CommandType = CommandType.Text;
-                    cmd.ExecuteNonQuery();
-                }
-            }
+            recordsDAL rec = new recordsDAL();
+            rec.InsertRecord("1", "1", "Rock", "1", "1");
             Console.ReadLine();
         }
+        //private SqlConnection _SqlConnection = null;
+        //private readonly string _connectionString = ConfigurationManager.AppSettings["connectionString"];
+        //private void OpenConnection()
+        //{
+        //    _SqlConnection = new SqlConnection()
+        //    {
+        //        ConnectionString = _connectionString
+        //    };
+        //    _SqlConnection.Open();
+        //}
+        //private void CloseConnection()
+        //{
+        //    if(_SqlConnection?.State != ConnectionState.Closed)
+        //    {
+        //        _SqlConnection?.Close();
+        //    }
+        //}
+
         private static async void getHtmlAsync()
         {
             //webScraper
