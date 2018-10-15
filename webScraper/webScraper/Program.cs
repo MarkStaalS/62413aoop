@@ -20,10 +20,12 @@ namespace webScraper
     {
         static void Main(string[] args)
         {
-            //recordsDAL rec = new recordsDAL();
+            recordsDAL rec = new recordsDAL();
             //rec.ResetDatabase();
             getHtml();
             //Console.ReadLine();
+            //TODO move artist to seperate table
+            //add create database function
         }
 
         private static void getHtml()
@@ -68,18 +70,19 @@ namespace webScraper
                     }
                     else
                     {
-                        ctr++;
-
-                        printRecordInfo(recordInfo.genre,
-                            recordInfo.imgUrl,
-                            recordInfo.artist,
-                            recordInfo.recordTitle);
-
-                        rec.InsertRecord(recordInfo.recordTitle,
+                        //Checks weather or not the record has been added
+                        if (rec.InsertRecord(recordInfo.recordTitle,
                             recordInfo.artist,
                             recordInfo.genre,
                             "recordInfo.imgUrl",
-                            "pathUrl");
+                            "pathUrl"))
+                        {
+                            printRecordInfo(recordInfo.genre,
+                                recordInfo.imgUrl,
+                                recordInfo.artist,
+                                recordInfo.recordTitle);
+                            ctr++;
+                        }
                     }
                 }
                 //next page

@@ -23,15 +23,14 @@ namespace webScraper.DataOperations
                 _SqlConnection?.Close();
             }
         }
-        public void InsertRecord(string name, string artist, string genre,string url, string pathUrl)
+        public bool InsertRecord(string name, string artist, string genre,string url, string pathUrl)
         {
             OpenConnection();
             InsertGenre(genre);
-            string sql = "INSERT INTO records" +
-                "(recordName,recordArtist,recordGenre,recordUrl,recordPathUrl)" +
-                "Values" +
-                "(@name, @artist, @genre, @url, @pathUrl)";
-
+            //Checks weather the record exsists in the table if not adds it
+            bool exsists = true;
+            string sql = $"SELECT * FROM records WHERE (recordName = @name AND " +
+                $"recordArtist = @artist AND recordGenre = @genre AND recordUrl = @url AND recordPathUrl = @pathUrl)";
             using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
             {
                 SqlParameter parameter = new SqlParameter
@@ -74,10 +73,74 @@ namespace webScraper.DataOperations
                 };
                 cmd.Parameters.Add(parameter);
 
-                cmd.CommandType = CommandType.Text;
-                cmd.ExecuteNonQuery();
+                using (SqlDataReader dataReader = cmd.ExecuteReader())
+                {
+                    if (!dataReader.Read())
+                    {
+                        exsists = false;
+                    }
+                }
             }
-            CloseConnection();
+            if (!exsists)
+            {
+                sql = "INSERT INTO records" +
+                "(recordName,recordArtist,recordGenre,recordUrl,recordPathUrl)" +
+                "Values" +
+                "(@name, @artist, @genre, @url, @pathUrl)";
+
+                using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
+                {
+                    SqlParameter parameter = new SqlParameter
+                    {
+                        ParameterName = "@name",
+                        Value = name,
+                        SqlDbType = SqlDbType.Char
+                    };
+                    cmd.Parameters.Add(parameter);
+
+                    parameter = new SqlParameter
+                    {
+                        ParameterName = "@artist",
+                        Value = artist,
+                        SqlDbType = SqlDbType.Char
+                    };
+                    cmd.Parameters.Add(parameter);
+
+                    parameter = new SqlParameter
+                    {
+                        ParameterName = "@genre",
+                        Value = genre,
+                        SqlDbType = SqlDbType.Char
+                    };
+                    cmd.Parameters.Add(parameter);
+
+                    parameter = new SqlParameter
+                    {
+                        ParameterName = "@url",
+                        Value = url,
+                        SqlDbType = SqlDbType.Char
+                    };
+                    cmd.Parameters.Add(parameter);
+
+                    parameter = new SqlParameter
+                    {
+                        ParameterName = "@pathUrl",
+                        Value = pathUrl,
+                        SqlDbType = SqlDbType.Char
+                    };
+                    cmd.Parameters.Add(parameter);
+
+                    cmd.CommandType = CommandType.Text;
+                    cmd.ExecuteNonQuery();
+                }
+                CloseConnection();
+                return true;
+            }
+            else
+            {
+                CloseConnection();
+                return false;
+            }
         }
         private void InsertGenre(string genre)
         {
