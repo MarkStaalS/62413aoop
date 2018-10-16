@@ -27,6 +27,7 @@ namespace webScraper.DataOperations
         {
             OpenConnection();
             InsertGenre(genre);
+            InsertArtist(artist);
             //Checks weather the record exsists in the table if not adds it
             bool exsists = true;
             string sql = $"SELECT * FROM records WHERE (recordName = @name AND " +
@@ -153,9 +154,16 @@ namespace webScraper.DataOperations
         {
             //Checks weather the genre exsists in the table if not adds it
             bool exsists = true;
-            string sql = $"SELECT * FROM genre WHERE genre = '{genre}'";
+            string sql = $"SELECT * FROM genre WHERE genre = @genre";
             using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
             {
+                SqlParameter parameter = new SqlParameter
+                {
+                    ParameterName = "@genre",
+                    Value = genre,
+                    SqlDbType = SqlDbType.Char
+                };
+                cmd.Parameters.Add(parameter);
                 using (SqlDataReader dataReader = cmd.ExecuteReader())
                 {
                     if (!dataReader.Read())
@@ -167,9 +175,56 @@ namespace webScraper.DataOperations
             if (!exsists)
             {
                 sql = "INSERT INTO genre" +
-                        $"(genre) Values ('{genre}')";
+                        $"(genre) Values (@genre)";
                 using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
                 {
+                    SqlParameter parameter = new SqlParameter
+                    {
+                        ParameterName = "@genre",
+                        Value = genre,
+                        SqlDbType = SqlDbType.Char
+                    };
+                    cmd.Parameters.Add(parameter);
+                    cmd.CommandType = CommandType.Text;
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+        private void InsertArtist(string artist)
+        {
+            //Checks weather the artist exsists in the table if not adds it
+            bool exsists = true;
+            string sql = $"SELECT * FROM artists WHERE artist = @artist";
+            using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
+            {
+                SqlParameter parameter = new SqlParameter
+                {
+                    ParameterName = "@artist",
+                    Value = artist,
+                    SqlDbType = SqlDbType.Char
+                };
+                cmd.Parameters.Add(parameter);
+                using (SqlDataReader dataReader = cmd.ExecuteReader())
+                {
+                    if (!dataReader.Read())
+                    {
+                        exsists = false;
+                    }
+                }
+            }
+            if (!exsists)
+            {
+                sql = "INSERT INTO artists" +
+                        $"(artist) Values (@artist)";
+                using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
+                {
+                    SqlParameter parameter = new SqlParameter
+                    {
+                        ParameterName = "@artist",
+                        Value = artist,
+                        SqlDbType = SqlDbType.Char
+                    };
+                    cmd.Parameters.Add(parameter);
                     cmd.CommandType = CommandType.Text;
                     cmd.ExecuteNonQuery();
                 }

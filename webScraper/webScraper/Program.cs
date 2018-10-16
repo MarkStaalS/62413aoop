@@ -21,7 +21,7 @@ namespace webScraper
         static void Main(string[] args)
         {
             recordsDAL rec = new recordsDAL();
-            //rec.ResetDatabase();
+            rec.ResetDatabase();
             getHtml(10);
             //Console.ReadLine();
             //TODO move artist to seperate table
