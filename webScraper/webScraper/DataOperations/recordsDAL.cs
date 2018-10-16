@@ -129,9 +129,16 @@ namespace webScraper.DataOperations
                         SqlDbType = SqlDbType.Char
                     };
                     cmd.Parameters.Add(parameter);
-
                     cmd.CommandType = CommandType.Text;
-                    cmd.ExecuteNonQuery();
+                    //Error handling
+                    try
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                    catch
+                    {
+
+                    }
                 }
                 CloseConnection();
                 return true;

@@ -22,13 +22,13 @@ namespace webScraper
         {
             recordsDAL rec = new recordsDAL();
             //rec.ResetDatabase();
-            getHtml();
+            getHtml(10);
             //Console.ReadLine();
             //TODO move artist to seperate table
             //add create database function
         }
 
-        private static void getHtml()
+        private static void getHtml(int maxCtr)
         {
             //webScraper
             // scrapes website and gets record information and link to image
@@ -39,7 +39,6 @@ namespace webScraper
 
             recordsDAL rec = new recordsDAL();
             int ctr = 0;
-            int maxCtr = 5;
             while (ctr < maxCtr)
             {
                 HtmlWeb web = new HtmlWeb();
