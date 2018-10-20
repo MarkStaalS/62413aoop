@@ -226,7 +226,14 @@ namespace webScraper.DataOperations
                     };
                     cmd.Parameters.Add(parameter);
                     cmd.CommandType = CommandType.Text;
-                    cmd.ExecuteNonQuery();
+                    try
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                    catch
+                    {
+
+                    }
                 }
             }
         }

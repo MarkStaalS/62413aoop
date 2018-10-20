@@ -13,6 +13,8 @@ using System.Data.Common;
 using System.Configuration;
 using System.Data.SqlClient;
 using webScraper.DataOperations;
+using webScraper.Models;
+using System.Text.RegularExpressions;
 
 namespace webScraper
 {
@@ -24,8 +26,9 @@ namespace webScraper
             rec.ResetDatabase();
             getHtml(10);
             //Console.ReadLine();
-            //TODO move artist to seperate table
-            //add create database function
+            //TODO 
+            //download covers from the provided links
+            //figure out path and imgUrl insertion into the database
         }
 
         private static void getHtml(int maxCtr)
@@ -37,7 +40,7 @@ namespace webScraper
             //path url first page
             string urlPath = @"/search/?type=release";
 
-            recordsDAL rec = new recordsDAL();
+            recordsDAL recordDAL = new recordsDAL();
             int ctr = 0;
             while (ctr < maxCtr)
             {
@@ -61,28 +64,32 @@ namespace webScraper
                         break;
 
                     string recordUrlPath = listItem.GetAttributeValue("href", "").ToString();
-                    (string genre, string imgUrl, string artist, string recordTitle) recordInfo =
-                        Program.getRecordInfo(url + recordUrlPath);
-                    if (recordInfo.genre == null || recordInfo.imgUrl == "thumbnail_border")
+
+                    record recordObj = new record();
+                    recordObj = setRecordObj(url + recordUrlPath, recordObj);
+
+                    if (recordObj.genre == null || recordObj.url == "thumbnail_border")
                     {
                         Console.WriteLine("Error\n");
                     }
                     else
                     {
                         //Checks weather or not the record has been added
-                        if (rec.InsertRecord(recordInfo.recordTitle,
-                            recordInfo.artist,
-                            recordInfo.genre,
-                            "recordInfo.imgUrl",
+                        if (recordDAL.InsertRecord(
+                            recordObj.name,
+                            recordObj.artist,
+                            recordObj.genre,
+                            "url",
                             "pathUrl"))
                         {
-                            printRecordInfo(recordInfo.genre,
-                                recordInfo.imgUrl,
-                                recordInfo.artist,
-                                recordInfo.recordTitle);
+                            printRecordInfo(recordObj.genre,
+                                recordObj.url,
+                                recordObj.artist,
+                                recordObj.name);
                             ctr++;
                         }
                     }
+                    recordObj.Dispose();
                 }
                 //next page
                 urlPath = getNextPage(htmlDoc);
@@ -91,6 +98,25 @@ namespace webScraper
             }
             Console.WriteLine("done");
             Console.ReadLine();
+        }
+        private static record setRecordObj(string url, record record)
+        {
+            //scrape single record
+            HtmlWeb web = new HtmlWeb();
+            var htmlDoc = new HtmlDocument();
+                try
+                {
+                    htmlDoc = web.Load(url);
+                    record.genre = getGenre(htmlDoc);
+                    record.url = getImgUrl(htmlDoc);
+                    record.artist = getArtist(htmlDoc);
+                    record.name = getRecordTitle(htmlDoc);
+                    return record;
+                }
+                catch (Exception)
+                {
+                    return record;
+                }
         }
         private static void printRecordInfo(string genre, string imgUrl, string artist, string recordTitle)
         {
@@ -105,25 +131,7 @@ namespace webScraper
                     .SelectSingleNode("//*[@id=\"pjax_container\"]/div[3]/form/div[1]/ul/li[2]/a")
                     .GetAttributeValue("href", "");
         }
-        private static (string genre, string imgUrl, string artist, string recordTitle) getRecordInfo(string url)
-        {
-            //scrape single record
-            HtmlWeb web = new HtmlWeb();
-            var htmlDoc = new HtmlDocument();
-
-            try
-            {
-                htmlDoc = web.Load(url);
-                return (getGenre(htmlDoc),
-                    getImgUrl(htmlDoc), 
-                    getArtist(htmlDoc), 
-                    getRecordTitle(htmlDoc));
-            }
-            catch (Exception)
-            {
-                return (null, null, null, null);
-            }
-        }
+        #region GetRecordData
         private static string getGenre(HtmlDocument htmlDoc)
         {
             var genre_ = htmlDoc.DocumentNode.Descendants("a")
@@ -153,5 +161,6 @@ namespace webScraper
                 .ChildNodes.ToList();
             return profileTitleNodes[profileTitleNodes.Count - 2].InnerText.Trim();
         }
+        #endregion
     }
 }
