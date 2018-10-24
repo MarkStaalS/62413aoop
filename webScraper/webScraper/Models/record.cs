@@ -13,7 +13,6 @@ namespace webScraper.Models
         public string genre { get; set; }
         public string url { get; set; }
         public string pathUrl { get; set; }
-
         public record()
         {
         }

@@ -23,8 +23,10 @@ namespace webScraper.DataOperations
                 _SqlConnection?.Close();
             }
         }
+        #region SQL insert
         public bool InsertRecord(string name, string artist, string genre,string url, string pathUrl)
         {
+            //laves om så den kan tage et record objekt som indput
             OpenConnection();
             InsertGenre(genre);
             InsertArtist(artist);
@@ -237,6 +239,11 @@ namespace webScraper.DataOperations
                 }
             }
         }
+        #endregion
+        #region SQL select
+
+        #endregion
+        #region Utility tools
         public void ResetDatabase()
         {
             OpenConnection();
@@ -262,5 +269,6 @@ namespace webScraper.DataOperations
             }
             CloseConnection();
         }
+        #endregion
     }
 }

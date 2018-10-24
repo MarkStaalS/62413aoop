@@ -24,14 +24,14 @@ namespace webScraper
         {
             recordsDAL rec = new recordsDAL();
             rec.ResetDatabase();
-            getHtml(10);
+            getRecords(10);
             //Console.ReadLine();
             //TODO 
             //download covers from the provided links
             //figure out path and imgUrl insertion into the database
         }
 
-        private static void getHtml(int maxCtr)
+        private static void getRecords(int maxCtr)
         {
             //webScraper
             // scrapes website and gets record information and link to image
@@ -74,13 +74,18 @@ namespace webScraper
                     }
                     else
                     {
+                        //download image
+
+                        //get id for path name
+                        recordObj.pathUrl = "pathUrl";
+                        recordObj.url = recordUrlPath;
                         //Checks weather or not the record has been added
                         if (recordDAL.InsertRecord(
                             recordObj.name,
                             recordObj.artist,
                             recordObj.genre,
-                            "url",
-                            "pathUrl"))
+                            recordObj.url,
+                            recordObj.pathUrl))
                         {
                             printRecordInfo(recordObj.genre,
                                 recordObj.url,
