@@ -22,13 +22,11 @@ namespace webScraper
     {
         static void Main(string[] args)
         {
-            recordsDAL rec = new recordsDAL();
+            recordsDataAccessLayer rec = new recordsDataAccessLayer();
             rec.ResetDatabase();
             getRecords(10);
-            //Console.ReadLine();
             //TODO 
-            //download covers from the provided links
-            //figure out path and imgUrl insertion into the database
+            //sql use correct id numbering without jumping
         }
 
         private static void getRecords(int maxCtr)
@@ -40,7 +38,7 @@ namespace webScraper
             //path url first page
             string urlPath = @"/search/?type=release";
 
-            recordsDAL recordDAL = new recordsDAL();
+            recordsDataAccessLayer recordDAL = new recordsDataAccessLayer();
             int ctr = 0;
             while (ctr < maxCtr)
             {
@@ -74,23 +72,20 @@ namespace webScraper
                     }
                     else
                     {
-                        //download image
-
-                        //get id for path name
-                        recordObj.pathUrl = "pathUrl";
-                        recordObj.url = recordUrlPath;
-                        //Checks weather or not the record has been added
+                        //Checks weather or not the record has been added and weather to download cover image
                         if (recordDAL.InsertRecord(
                             recordObj.name,
                             recordObj.artist,
                             recordObj.genre,
-                            recordObj.url,
+                            recordUrlPath,
                             recordObj.pathUrl))
                         {
                             printRecordInfo(recordObj.genre,
                                 recordObj.url,
                                 recordObj.artist,
                                 recordObj.name);
+                            string id = recordDAL.GetLatestId();
+                            recordDAL.updateRecordPtah(id, downloadImage(recordObj.url, id));
                             ctr++;
                         }
                     }
@@ -104,6 +99,27 @@ namespace webScraper
             Console.WriteLine("done");
             Console.ReadLine();
         }
+        private static string downloadImage(string imgUrl, string id)
+        {
+            string BaseDir = @"C:\Users\ham-d\Desktop\test\";
+            System.IO.Directory.CreateDirectory(BaseDir); // Creates directory if it not already exists.
+
+            using(WebClient web = new WebClient())
+            {
+                web.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+                try
+                {
+                    web.DownloadFile(imgUrl, BaseDir + id + ".jpg");
+                    return BaseDir + id + ".jpg";
+                }
+                catch (System.ArgumentException)
+                {
+                    Console.WriteLine("There was an error downloading a cover.");
+                    return null;
+                }
+            }
+
+        }
         private static record setRecordObj(string url, record record)
         {
             //scrape single record
@@ -116,6 +132,7 @@ namespace webScraper
                     record.url = getImgUrl(htmlDoc);
                     record.artist = getArtist(htmlDoc);
                     record.name = getRecordTitle(htmlDoc);
+                    record.pathUrl = "PathUrl"; // placeholder
                     return record;
                 }
                 catch (Exception)
