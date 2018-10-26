@@ -22,21 +22,22 @@ namespace webScraper
     {
         static void Main(string[] args)
         {
-            recordsDataAccessLayer rec = new recordsDataAccessLayer();
-            rec.ResetDatabase();
-            getRecords(10);
+
+            string BaseDir = @"C:\Users\ham-d\Desktop\test\"; //folder for the images
+
+            //Reset(BaseDir);
+            getRecords(10, BaseDir);
             //TODO 
             //sql use correct id numbering without jumping
         }
 
-        private static void getRecords(int maxCtr)
+        private static void getRecords(int maxCtr, string BaseDirectory)
         {
             //webScraper
             // scrapes website and gets record information and link to image
-            //base url
-            string url = @"https://www.discogs.com";
-            //path url first page
-            string urlPath = @"/search/?type=release";
+
+            string url = @"https://www.discogs.com"; //Base url
+            string urlPath = @"/search/?type=release";//path url first page
 
             recordsDataAccessLayer recordDAL = new recordsDataAccessLayer();
             int ctr = 0;
@@ -45,17 +46,14 @@ namespace webScraper
                 HtmlWeb web = new HtmlWeb();
                 HtmlDocument htmlDoc = web.Load(url + urlPath);
 
-                //Using html atributes and nodes to get required information
-                //gets the part of the html document contaning the list
-                var recordList = htmlDoc.DocumentNode.Descendants("div")
+                var recordList = htmlDoc.DocumentNode.Descendants("div") //Html attributes containing list of records
                     .Where(node => node.GetAttributeValue("id", "")
                     .Equals("search_results")).ToList();
-                //divides the above section into bits for each record and puts 
-                //them in a list
-                var listItems = recordList[0].Descendants("a")
+
+                var listItems = recordList[0].Descendants("a") //List of record links
                     .Where(node => node.GetAttributeValue("class", "")
                     .Equals("search_result_title")).ToList();
-                //gets website links and then visits the website to get
+
                 foreach (var listItem in listItems)
                 {
                     if (ctr >= maxCtr)
@@ -85,13 +83,13 @@ namespace webScraper
                                 recordObj.artist,
                                 recordObj.name);
                             string id = recordDAL.GetLatestId();
-                            recordDAL.updateRecordPtah(id, downloadImage(recordObj.url, id));
+                            recordDAL.updateRecordPtah(id, downloadImage(recordObj.url, id, BaseDirectory)); //Update file path
                             ctr++;
                         }
                     }
                     recordObj.Dispose();
                 }
-                //next page
+
                 urlPath = getNextPage(htmlDoc);
 
                 Console.WriteLine($"\n *** next page: {urlPath} count:{ctr}*** \n");
@@ -99,18 +97,17 @@ namespace webScraper
             Console.WriteLine("done");
             Console.ReadLine();
         }
-        private static string downloadImage(string imgUrl, string id)
+        private static string downloadImage(string imgUrl, string id, string BaseDirectory)
         {
-            string BaseDir = @"C:\Users\ham-d\Desktop\test\";
-            System.IO.Directory.CreateDirectory(BaseDir); // Creates directory if it not already exists.
+            System.IO.Directory.CreateDirectory(BaseDirectory); // Creates directory if it not already exists.
 
             using(WebClient web = new WebClient())
             {
                 web.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
                 try
                 {
-                    web.DownloadFile(imgUrl, BaseDir + id + ".jpg");
-                    return BaseDir + id + ".jpg";
+                    web.DownloadFile(imgUrl, BaseDirectory + id + ".jpg");
+                    return BaseDirectory + id + ".jpg";
                 }
                 catch (System.ArgumentException)
                 {
@@ -139,13 +136,6 @@ namespace webScraper
                 {
                     return record;
                 }
-        }
-        private static void printRecordInfo(string genre, string imgUrl, string artist, string recordTitle)
-        {
-            Console.WriteLine($"url: {imgUrl} \n" +
-                        $"record title: {recordTitle} \n" +
-                        $"artist: {artist} \n" +
-                        $"genre: {genre}\n");
         }
         private static string getNextPage(HtmlDocument htmlDoc)
         {
@@ -184,5 +174,18 @@ namespace webScraper
             return profileTitleNodes[profileTitleNodes.Count - 2].InnerText.Trim();
         }
         #endregion
+        private static void printRecordInfo(string genre, string imgUrl, string artist, string recordTitle)
+        {
+            Console.WriteLine($"url: {imgUrl} \n" +
+                        $"record title: {recordTitle} \n" +
+                        $"artist: {artist} \n" +
+                        $"genre: {genre}\n");
+        }
+        private static void Reset(string BaseDirrectory)
+        {
+            recordsDataAccessLayer recordsDataAccessLayer = new recordsDataAccessLayer();
+            recordsDataAccessLayer.ResetDatabase();
+            System.IO.Directory.Delete(BaseDirrectory, true); // Deletes directory
+        }
     }
 }
