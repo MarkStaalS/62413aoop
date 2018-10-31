@@ -64,9 +64,9 @@ namespace webScraper
                     string recordUrlPath = listItem.GetAttributeValue("href", "").ToString();
 
                     record recordObj = new record();
-                    recordObj = setRecordObj(url + recordUrlPath, recordObj);
+                    recordObj = setRecordObj(url + recordUrlPath, recordUrlPath, recordObj);
 
-                    if (recordObj.genre == null || recordObj.url == "thumbnail_border")
+                    if (recordObj.genre == null || recordObj.imgUrl == "thumbnail_border")
                     {
                         Console.WriteLine("Error\n");
                     }
@@ -77,7 +77,7 @@ namespace webScraper
                             recordObj.name,
                             recordObj.artist,
                             recordObj.genre,
-                            recordUrlPath,
+                            recordObj.url,
                             recordObj.pathUrl))
                         {
                             printRecordInfo(recordObj.genre,
@@ -85,7 +85,7 @@ namespace webScraper
                                 recordObj.artist,
                                 recordObj.name);
                             string id = recordDAL.GetLatestId();
-                            recordDAL.updateRecordPtah(id, downloadImage(recordObj.url, id, BaseDirectory)); //Update file path
+                            recordDAL.updateRecordPtah(id, downloadImage(recordObj.imgUrl, id, BaseDirectory)); //Update file path
                             ctr++;
                         }
                     }
@@ -119,7 +119,7 @@ namespace webScraper
             }
 
         }
-        private static record setRecordObj(string url, record record)
+        private static record setRecordObj(string url, string urlPath, record record)
         {
             //scrape single record
             HtmlWeb web = new HtmlWeb();
@@ -127,10 +127,12 @@ namespace webScraper
                 try
                 {
                     htmlDoc = web.Load(url);
-                    record.genre = getGenre(htmlDoc);
-                    record.url = getImgUrl(htmlDoc);
-                    record.artist = getArtist(htmlDoc);
+                    record.tracklist = getTracks(htmlDoc);
                     record.name = getRecordTitle(htmlDoc);
+                    record.artist = getArtist(htmlDoc);
+                    record.genre = getGenre(htmlDoc);
+                    record.url = urlPath;
+                    record.imgUrl = getImgUrl(htmlDoc);
                     record.pathUrl = "PathUrl"; // placeholder
                     return record;
                 }
@@ -138,6 +140,26 @@ namespace webScraper
                 {
                     return record;
                 }
+        }
+        private static List<track> getTracks(HtmlDocument htmlDoc)
+        {
+            List<track> trackList = new List<track>();
+            var htmlTrackList = htmlDoc.DocumentNode.Descendants("tr")
+                .Where(node => node.GetAttributeValue("class", "")
+                    .Contains("track")).ToList();
+
+            foreach (var t in htmlTrackList)
+            {
+                track track = new track();
+                var trackInfo = t.ChildNodes.Where(node => node.GetAttributeValue("class", "")
+                    .Contains("track")).ToList();
+                track.number = Int32.Parse(trackInfo[0].InnerText.ToString());
+                track.name = trackInfo[trackInfo.Count-2].InnerText.ToString();
+                track.duration = trackInfo[trackInfo.Count-1].InnerText.ToString().Trim();
+                Console.WriteLine($"{track.number}, {track.name}, {track.duration}");
+                trackList.Add(track);
+            }
+            return trackList;
         }
         private static string getNextPage(HtmlDocument htmlDoc)
         {

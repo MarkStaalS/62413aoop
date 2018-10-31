@@ -11,8 +11,10 @@ namespace webScraper.Models
         public string name { get; set; }
         public string artist { get; set; }
         public string genre { get; set; }
+        public string imgUrl { get; set; }
         public string url { get; set; }
         public string pathUrl { get; set; }
+        public List<track> tracklist { get; set; }
         public record()
         {
         }
