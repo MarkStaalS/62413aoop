@@ -29,6 +29,8 @@ namespace webScraper
             getRecords(10, BaseDir);
             //TODO 
             //sql use correct id numbering without jumping
+            //Ryg datamodel(record.cs) og dal ud i en Dll så de kan bruges af en anden applikation
+            //Konfiguration
         }
 
         private static void getRecords(int maxCtr, string BaseDirectory)

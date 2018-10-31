@@ -34,6 +34,7 @@ namespace webScraper.DataOperations
             string sql;
             if (!RecordExsists( name, artist, genre, url))
             {
+                //lav til funktion
                 sql = "INSERT INTO records" +
                 "(recordName, recordArtist, recordGenre, recordUrl, recordPathUrl)" +
                 "Values" +
