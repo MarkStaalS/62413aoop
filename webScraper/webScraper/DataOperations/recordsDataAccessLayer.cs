@@ -30,14 +30,16 @@ namespace webScraper.DataOperations
             OpenConnection();
             InsertGenre(record.genre);
             InsertArtist(record.artist);
+            InsertCountry(record.country);
+            InsertLabel(record.label);
             //Checks weather the record exsists in the table if not adds it
             if (!RecordExsists(record))
             {
                 //lav til funktion
                 string sql = "INSERT INTO records" +
-                "(name, artist, genre, url, pathUrl)" +
+                "(name, artist, genre, url, pathUrl, country, label, released)" +
                 "Values" +
-                "(@name, @artist, @genre, @url, @pathUrl)";
+                "(@name, @artist, @genre, @url, @pathUrl, @country, @label, @released)";
 
                 using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
                 {
@@ -80,9 +82,32 @@ namespace webScraper.DataOperations
                         SqlDbType = SqlDbType.Char
                     };
                     cmd.Parameters.Add(parameter);
+
+                    parameter = new SqlParameter
+                    {
+                        ParameterName = "@country",
+                        Value = record.country,
+                        SqlDbType = SqlDbType.Char
+                    };
+                    cmd.Parameters.Add(parameter);
+
+                    parameter = new SqlParameter
+                    {
+                        ParameterName = "@label",
+                        Value = record.label,
+                        SqlDbType = SqlDbType.Char
+                    };
+                    cmd.Parameters.Add(parameter);
+
+                    parameter = new SqlParameter
+                    {
+                        ParameterName = "@released",
+                        Value = record.released,
+                        SqlDbType = SqlDbType.Char
+                    };
+                    cmd.Parameters.Add(parameter);
                     cmd.CommandType = CommandType.Text;
-                    //Error handling
-                    try
+                    try //Error handling
                     {
                         cmd.ExecuteNonQuery();
                         CloseConnection();
@@ -135,6 +160,60 @@ namespace webScraper.DataOperations
                     {
                         ParameterName = "@artist",
                         Value = artist,
+                        SqlDbType = SqlDbType.Char
+                    };
+                    cmd.Parameters.Add(parameter);
+                    cmd.CommandType = CommandType.Text;
+                    try
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+        }
+        private void InsertCountry(string country)
+        {
+            //Checks weather the artist exsists in the table if not adds it
+            if (!CountryExsists(country))
+            {
+                string sql = "INSERT INTO country" +
+                        $"(country) Values (@country)";
+                using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
+                {
+                    SqlParameter parameter = new SqlParameter
+                    {
+                        ParameterName = "@country",
+                        Value = country,
+                        SqlDbType = SqlDbType.Char
+                    };
+                    cmd.Parameters.Add(parameter);
+                    cmd.CommandType = CommandType.Text;
+                    try
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+        }
+        private void InsertLabel(string label)
+        {
+            //Checks weather the artist exsists in the table if not adds it
+            if (!LabelExsists(label))
+            {
+                string sql = "INSERT INTO label" +
+                        $"(label) Values (@label)";
+                using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
+                {
+                    SqlParameter parameter = new SqlParameter
+                    {
+                        ParameterName = "@label",
+                        Value = label,
                         SqlDbType = SqlDbType.Char
                     };
                     cmd.Parameters.Add(parameter);
@@ -334,6 +413,56 @@ namespace webScraper.DataOperations
                 }
             }
         }
+        private bool CountryExsists(string country)
+        {
+            string sql = $"SELECT * FROM country WHERE country = @country";
+            using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
+            {
+                SqlParameter parameter = new SqlParameter
+                {
+                    ParameterName = "@country",
+                    Value = country,
+                    SqlDbType = SqlDbType.Char
+                };
+                cmd.Parameters.Add(parameter);
+                using (SqlDataReader dataReader = cmd.ExecuteReader())
+                {
+                    if (!dataReader.Read())
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        private bool LabelExsists(string label)
+        {
+            string sql = $"SELECT * FROM label WHERE label = @label";
+            using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
+            {
+                SqlParameter parameter = new SqlParameter
+                {
+                    ParameterName = "@label",
+                    Value = label,
+                    SqlDbType = SqlDbType.Char
+                };
+                cmd.Parameters.Add(parameter);
+                using (SqlDataReader dataReader = cmd.ExecuteReader())
+                {
+                    if (!dataReader.Read())
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
         #endregion
         #region SQL update
         public void updateRecordPtah(string Id, string RecordPath)
@@ -403,6 +532,18 @@ namespace webScraper.DataOperations
                 cmd.ExecuteNonQuery();
             }
             sql = "DELETE FROM artists";
+            using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
+            {
+                cmd.CommandType = CommandType.Text;
+                cmd.ExecuteNonQuery();
+            }
+            sql = "DELETE FROM country";
+            using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
+            {
+                cmd.CommandType = CommandType.Text;
+                cmd.ExecuteNonQuery();
+            }
+            sql = "DELETE FROM label";
             using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
             {
                 cmd.CommandType = CommandType.Text;

@@ -61,7 +61,7 @@ namespace webScraper
                     if (ctr >= maxCtr)
                         break;
 
-                    string recordUrlPath = listItem.GetAttributeValue("href", "").ToString();
+                    string recordUrlPath = listItem.GetAttributeValue("href", "").ToString(); //url to record page
 
                     record recordObj = new record();
                     recordObj = setRecordObj(url + recordUrlPath, recordUrlPath, recordObj);
@@ -124,6 +124,9 @@ namespace webScraper
                 try
                 {
                     htmlDoc = web.Load(url);
+                    record.label = getLabel(htmlDoc);
+                    record.country = getCountry(htmlDoc);
+                    record.released = getReleased(htmlDoc);
                     record.tracklist = getTracks(htmlDoc);
                     record.name = getRecordTitle(htmlDoc);
                     record.artist = getArtist(htmlDoc);
@@ -137,27 +140,6 @@ namespace webScraper
                 {
                     return record;
                 }
-        }
-        private static List<track> getTracks(HtmlDocument htmlDoc)
-        {
-            //Get tracks from the record and returns them in a list
-            List<track> trackList = new List<track>();
-            var htmlTrackList = htmlDoc.DocumentNode.Descendants("tr")
-                .Where(node => node.GetAttributeValue("class", "")
-                    .Contains("track")).ToList();
-
-            foreach (var t in htmlTrackList)
-            {
-                track track = new track();
-                var trackInfo = t.ChildNodes.Where(node => node.GetAttributeValue("class", "")
-                    .Contains("track")).ToList();
-                track.number = Int32.Parse(trackInfo[0].InnerText.ToString());
-                track.name = trackInfo[trackInfo.Count-2].InnerText.ToString();
-                track.duration = trackInfo[trackInfo.Count-1].InnerText.ToString().Trim();
-                //Console.WriteLine($"{track.number}, {track.name}, {track.duration}");
-                trackList.Add(track);
-            }
-            return trackList;
         }
         private static string getNextPage(HtmlDocument htmlDoc)
         {
@@ -194,6 +176,45 @@ namespace webScraper
                 .SelectSingleNode("//*[@id=\"profile_title\"]")
                 .ChildNodes.ToList();
             return profileTitleNodes[profileTitleNodes.Count - 2].InnerText.Trim();
+        }
+        private static string getLabel(HtmlDocument htmlDoc)
+        {
+            return htmlDoc.DocumentNode
+                .SelectSingleNode("//*[@id=\"page_content\"]/div[1]/div[3]/div[2]/a")
+                .InnerText.ToString();
+        }
+        private static string getCountry(HtmlDocument htmlDoc)
+        {
+            return htmlDoc.DocumentNode
+                .SelectSingleNode("//*[@id=\"page_content\"]/div[1]/div[3]/div[6]/a")
+                .InnerText.Trim().ToString();
+        }
+        private static int getReleased(HtmlDocument htmlDoc)
+        {
+            return Int32.Parse(htmlDoc.DocumentNode
+                .SelectSingleNode("//*[@id=\"page_content\"]/div[1]/div[3]/div[8]/a")
+                .InnerText.Trim().ToString());
+        }
+        private static List<track> getTracks(HtmlDocument htmlDoc)
+        {
+            //Get tracks from the record and returns them in a list
+            List<track> trackList = new List<track>();
+            var htmlTrackList = htmlDoc.DocumentNode.Descendants("tr")
+                .Where(node => node.GetAttributeValue("class", "")
+                    .Contains("track")).ToList();
+
+            foreach (var t in htmlTrackList)
+            {
+                track track = new track();
+                var trackInfo = t.ChildNodes.Where(node => node.GetAttributeValue("class", "")
+                    .Contains("track")).ToList();
+                track.number = Int32.Parse(trackInfo[0].InnerText.ToString());
+                track.name = trackInfo[trackInfo.Count - 2].InnerText.ToString();
+                track.duration = trackInfo[trackInfo.Count - 1].InnerText.ToString().Trim();
+                //Console.WriteLine($"{track.number}, {track.name}, {track.duration}");
+                trackList.Add(track);
+            }
+            return trackList;
         }
         #endregion
         private static void printRecordInfo(string genre, string imgUrl, string artist, string recordTitle)

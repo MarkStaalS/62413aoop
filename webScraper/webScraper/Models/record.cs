@@ -14,11 +14,10 @@ namespace webScraper.Models
         public string imgUrl { get; set; }
         public string url { get; set; }
         public string pathUrl { get; set; }
+        public string country { get; set; }
+        public string label { get; set; }
+        public int released { get; set; }
         public List<track> tracklist { get; set; }
-        public record()
-        {
-        }
-
         #region IDisposable Members
         public void Dispose()
         {
