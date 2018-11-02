@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Configuration;
 using System.Data.SqlClient;
+using webScraper.Models;
 
 namespace webScraper.DataOperations
 {
@@ -24,15 +25,15 @@ namespace webScraper.DataOperations
             }
         }
         #region SQL insert
-        public bool InsertRecord(string name, string artist, string genre,string url, string pathUrl)
+        public bool InsertRecord(record record)
         {
             //laves om så den kan tage et record objekt som indput
             OpenConnection();
-            InsertGenre(genre);
-            InsertArtist(artist);
+            InsertGenre(record.genre);
+            InsertArtist(record.artist);
             //Checks weather the record exsists in the table if not adds it
             string sql;
-            if (!RecordExsists( name, artist, genre, url))
+            if (!RecordExsists(record))
             {
                 //lav til funktion
                 sql = "INSERT INTO records" +
@@ -45,7 +46,7 @@ namespace webScraper.DataOperations
                     SqlParameter parameter = new SqlParameter
                     {
                         ParameterName = "@name",
-                        Value = name,
+                        Value = record.name,
                         SqlDbType = SqlDbType.Char
                     };
                     cmd.Parameters.Add(parameter);
@@ -53,7 +54,7 @@ namespace webScraper.DataOperations
                     parameter = new SqlParameter
                     {
                         ParameterName = "@artist",
-                        Value = artist,
+                        Value = record.artist,
                         SqlDbType = SqlDbType.Char
                     };
                     cmd.Parameters.Add(parameter);
@@ -61,7 +62,7 @@ namespace webScraper.DataOperations
                     parameter = new SqlParameter
                     {
                         ParameterName = "@genre",
-                        Value = genre,
+                        Value = record.genre,
                         SqlDbType = SqlDbType.Char
                     };
                     cmd.Parameters.Add(parameter);
@@ -69,7 +70,7 @@ namespace webScraper.DataOperations
                     parameter = new SqlParameter
                     {
                         ParameterName = "@url",
-                        Value = url,
+                        Value = record.url,
                         SqlDbType = SqlDbType.Char
                     };
                     cmd.Parameters.Add(parameter);
@@ -77,7 +78,7 @@ namespace webScraper.DataOperations
                     parameter = new SqlParameter
                     {
                         ParameterName = "@pathUrl",
-                        Value = pathUrl,
+                        Value = record.pathUrl,
                         SqlDbType = SqlDbType.Char
                     };
                     cmd.Parameters.Add(parameter);
@@ -177,7 +178,7 @@ namespace webScraper.DataOperations
             CloseConnection();
             return id;
         }
-        private bool RecordExsists(string name, string artist, string genre,string url)
+        private bool RecordExsists(record record)
         {
             string sql = $"SELECT * FROM records WHERE (recordName = @name AND " +
                 $"recordArtist = @artist AND recordGenre = @genre AND recordUrl = @url)";
@@ -186,7 +187,7 @@ namespace webScraper.DataOperations
                 SqlParameter parameter = new SqlParameter
                 {
                     ParameterName = "@name",
-                    Value = name,
+                    Value = record.name,
                     SqlDbType = SqlDbType.Char
                 };
                 cmd.Parameters.Add(parameter);
@@ -194,7 +195,7 @@ namespace webScraper.DataOperations
                 parameter = new SqlParameter
                 {
                     ParameterName = "@artist",
-                    Value = artist,
+                    Value = record.artist,
                     SqlDbType = SqlDbType.Char
                 };
                 cmd.Parameters.Add(parameter);
@@ -202,7 +203,7 @@ namespace webScraper.DataOperations
                 parameter = new SqlParameter
                 {
                     ParameterName = "@genre",
-                    Value = genre,
+                    Value = record.genre,
                     SqlDbType = SqlDbType.Char
                 };
                 cmd.Parameters.Add(parameter);
@@ -210,7 +211,7 @@ namespace webScraper.DataOperations
                 parameter = new SqlParameter
                 {
                     ParameterName = "@url",
-                    Value = url,
+                    Value = record.url,
                     SqlDbType = SqlDbType.Char
                 };
                 cmd.Parameters.Add(parameter);

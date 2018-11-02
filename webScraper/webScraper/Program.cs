@@ -143,6 +143,7 @@ namespace webScraper
         }
         private static List<track> getTracks(HtmlDocument htmlDoc)
         {
+            //Get tracks from the record and returns them in a list
             List<track> trackList = new List<track>();
             var htmlTrackList = htmlDoc.DocumentNode.Descendants("tr")
                 .Where(node => node.GetAttributeValue("class", "")
@@ -156,7 +157,7 @@ namespace webScraper
                 track.number = Int32.Parse(trackInfo[0].InnerText.ToString());
                 track.name = trackInfo[trackInfo.Count-2].InnerText.ToString();
                 track.duration = trackInfo[trackInfo.Count-1].InnerText.ToString().Trim();
-                Console.WriteLine($"{track.number}, {track.name}, {track.duration}");
+                //Console.WriteLine($"{track.number}, {track.name}, {track.duration}");
                 trackList.Add(track);
             }
             return trackList;
