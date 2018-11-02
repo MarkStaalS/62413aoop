@@ -27,17 +27,15 @@ namespace webScraper.DataOperations
         #region SQL insert
         public bool InsertRecord(record record)
         {
-            //laves om så den kan tage et record objekt som indput
             OpenConnection();
             InsertGenre(record.genre);
             InsertArtist(record.artist);
             //Checks weather the record exsists in the table if not adds it
-            string sql;
             if (!RecordExsists(record))
             {
                 //lav til funktion
-                sql = "INSERT INTO records" +
-                "(recordName, recordArtist, recordGenre, recordUrl, recordPathUrl)" +
+                string sql = "INSERT INTO records" +
+                "(name, artist, genre, url, pathUrl)" +
                 "Values" +
                 "(@name, @artist, @genre, @url, @pathUrl)";
 
@@ -106,10 +104,9 @@ namespace webScraper.DataOperations
         private void InsertGenre(string genre)
         {
             //Checks weather the genre exsists in the table if not adds it
-            string sql;
             if (!GenreExsists(genre))
             {
-                sql = "INSERT INTO genre" +
+                string sql = "INSERT INTO genre" +
                         $"(genre) Values (@genre)";
                 using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
                 {
@@ -128,10 +125,9 @@ namespace webScraper.DataOperations
         private void InsertArtist(string artist)
         {
             //Checks weather the artist exsists in the table if not adds it
-            string sql;
             if (!ArtistExsists(artist))
             {
-                sql = "INSERT INTO artists" +
+                string sql = "INSERT INTO artists" +
                         $"(artist) Values (@artist)";
                 using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
                 {
@@ -151,6 +147,66 @@ namespace webScraper.DataOperations
                     {
                     }
                 }
+            }
+        }
+        public void insertTrackList(string id, record record)
+        {
+            foreach (track track in record.tracklist)
+            {
+                insertTrack(id, track);
+            }
+        }
+        private void insertTrack(string id, track track)
+        {
+            OpenConnection();
+
+            string sql = "INSERT INTO tracks" +
+            "(number, name, duration, record)" +
+            "Values" +
+            "(@number, @name, @duration, @record)";
+
+            using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
+            {
+                SqlParameter parameter = new SqlParameter
+                {
+                    ParameterName = "@number",
+                    Value = track.number,
+                    SqlDbType = SqlDbType.Int
+                };
+                cmd.Parameters.Add(parameter);
+
+                parameter = new SqlParameter
+                {
+                    ParameterName = "@name",
+                    Value = track.name,
+                    SqlDbType = SqlDbType.Char
+                };
+                cmd.Parameters.Add(parameter);
+
+                parameter = new SqlParameter
+                {
+                    ParameterName = "@duration",
+                    Value = track.duration,
+                    SqlDbType = SqlDbType.Char
+                };
+                cmd.Parameters.Add(parameter);
+
+                parameter = new SqlParameter
+                {
+                    ParameterName = "@record",
+                    Value = id,
+                    SqlDbType = SqlDbType.Int
+                };
+                cmd.Parameters.Add(parameter);
+                cmd.CommandType = CommandType.Text;
+                try
+                {
+                    cmd.ExecuteNonQuery();
+                }
+                    catch
+                {
+                }
+            CloseConnection();
             }
         }
         #endregion
@@ -180,8 +236,8 @@ namespace webScraper.DataOperations
         }
         private bool RecordExsists(record record)
         {
-            string sql = $"SELECT * FROM records WHERE (recordName = @name AND " +
-                $"recordArtist = @artist AND recordGenre = @genre AND recordUrl = @url)";
+            string sql = $"SELECT * FROM records WHERE (name = @name AND " +
+                $"artist = @artist AND genre = @genre AND url = @url)";
             using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
             {
                 SqlParameter parameter = new SqlParameter
@@ -285,7 +341,7 @@ namespace webScraper.DataOperations
             //Checks weather the artist exsists in the table if not adds it
             string sql;
             OpenConnection();
-            sql = "UPDATE records SET recordPathUrl = @RecordPath WHERE Id = @Id";
+            sql = "UPDATE records SET pathUrl = @RecordPath WHERE Id = @Id";
             using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
             {
                 SqlParameter parameter = new SqlParameter
@@ -320,8 +376,14 @@ namespace webScraper.DataOperations
         public void ResetDatabase()
         {
             OpenConnection();
+            string sql = "DELETE FROM tracks"; //needs to be before records because this uses records as forgin key
+            using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
+            {
+                cmd.CommandType = CommandType.Text;
+                cmd.ExecuteNonQuery();
+            }
             //Deletes rows from tables
-            string sql = "DELETE FROM records";
+            sql = "DELETE FROM records";
             using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
             {
                 cmd.CommandType = CommandType.Text;
@@ -335,6 +397,12 @@ namespace webScraper.DataOperations
                 cmd.ExecuteNonQuery();
             }
             sql = "DELETE FROM genre";
+            using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
+            {
+                cmd.CommandType = CommandType.Text;
+                cmd.ExecuteNonQuery();
+            }
+            sql = "DELETE FROM artists";
             using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
             {
                 cmd.CommandType = CommandType.Text;

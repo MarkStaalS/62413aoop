@@ -25,7 +25,7 @@ namespace webScraper
 
             string BaseDir = @"C:\Users\ham-d\Desktop\test\"; //folder for the images
 
-            //Reset(BaseDir);
+            Reset(BaseDir);
             getRecords(10, BaseDir);
             //TODO 
             //sql use correct id numbering without jumping
@@ -74,11 +74,7 @@ namespace webScraper
                     {
                         //Checks weather or not the record has been added and weather to download cover image
                         if (recordDAL.InsertRecord(
-                            recordObj.name,
-                            recordObj.artist,
-                            recordObj.genre,
-                            recordObj.url,
-                            recordObj.pathUrl))
+                            recordObj))
                         {
                             printRecordInfo(recordObj.genre,
                                 recordObj.url,
@@ -86,6 +82,7 @@ namespace webScraper
                                 recordObj.name);
                             string id = recordDAL.GetLatestId();
                             recordDAL.updateRecordPtah(id, downloadImage(recordObj.imgUrl, id, BaseDirectory)); //Update file path
+                            recordDAL.insertTrackList(id, recordObj);
                             ctr++;
                         }
                     }
@@ -210,7 +207,13 @@ namespace webScraper
         {
             recordsDataAccessLayer recordsDataAccessLayer = new recordsDataAccessLayer();
             recordsDataAccessLayer.ResetDatabase();
-            System.IO.Directory.Delete(BaseDirrectory, true); // Deletes directory
+            try
+            {
+                System.IO.Directory.Delete(BaseDirrectory, true); // Deletes directory
+            }
+            catch 
+            {
+            }
         }
     }
 }
