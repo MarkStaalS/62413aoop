@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace webScraper.Models
 {
-    class record : IDisposable
+    class record
     {
         public string name { get; set; }
         public string artist { get; set; }
@@ -16,29 +16,7 @@ namespace webScraper.Models
         public string pathUrl { get; set; }
         public string country { get; set; }
         public string label { get; set; }
-        public int released { get; set; }
+        public string released { get; set; }
         public List<track> tracklist { get; set; }
-        #region IDisposable Members
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if(disposing == true)
-            {
-                name = null;
-                artist = null;
-                genre = null;
-                url = null;
-                pathUrl = null;
-            }
-            else
-            {
-
-            }
-        }
-        #endregion
     }
 }

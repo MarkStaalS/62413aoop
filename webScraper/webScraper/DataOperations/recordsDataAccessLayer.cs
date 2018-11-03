@@ -38,7 +38,7 @@ namespace webScraper.DataOperations
                 //lav til funktion
                 string sql = "INSERT INTO records" +
                 "(name, artist, genre, url, pathUrl, country, label, released)" +
-                "Values" +
+                "VALUES" +
                 "(@name, @artist, @genre, @url, @pathUrl, @country, @label, @released)";
 
                 using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
@@ -132,7 +132,7 @@ namespace webScraper.DataOperations
             if (!GenreExsists(genre))
             {
                 string sql = "INSERT INTO genre" +
-                        $"(genre) Values (@genre)";
+                        $"(genre) VALUES (@genre)";
                 using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
                 {
                     SqlParameter parameter = new SqlParameter
@@ -153,7 +153,7 @@ namespace webScraper.DataOperations
             if (!ArtistExsists(artist))
             {
                 string sql = "INSERT INTO artists" +
-                        $"(artist) Values (@artist)";
+                        $"(artist) VALUES (@artist)";
                 using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
                 {
                     SqlParameter parameter = new SqlParameter
@@ -180,7 +180,7 @@ namespace webScraper.DataOperations
             if (!CountryExsists(country))
             {
                 string sql = "INSERT INTO country" +
-                        $"(country) Values (@country)";
+                        $"(country) VALUES (@country)";
                 using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
                 {
                     SqlParameter parameter = new SqlParameter
@@ -207,7 +207,7 @@ namespace webScraper.DataOperations
             if (!LabelExsists(label))
             {
                 string sql = "INSERT INTO label" +
-                        $"(label) Values (@label)";
+                        $"(label) VALUES (@label)";
                 using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
                 {
                     SqlParameter parameter = new SqlParameter
@@ -241,7 +241,7 @@ namespace webScraper.DataOperations
 
             string sql = "INSERT INTO tracks" +
             "(number, name, duration, record)" +
-            "Values" +
+            "VALUES" +
             "(@number, @name, @duration, @record)";
 
             using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))

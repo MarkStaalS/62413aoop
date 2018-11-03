@@ -25,8 +25,8 @@ namespace webScraper
 
             string BaseDir = @"C:\Users\ham-d\Desktop\test\"; //folder for the images
 
-            Reset(BaseDir);
-            getRecords(10, BaseDir);
+            //Reset(BaseDir);
+            getRecords(30, BaseDir);
             //TODO 
             //sql use correct id numbering without jumping
             //Ryg datamodel(record.cs) og dal ud i en Dll så de kan bruges af en anden applikation
@@ -73,20 +73,16 @@ namespace webScraper
                     else
                     {
                         //Checks weather or not the record has been added and weather to download cover image
-                        if (recordDAL.InsertRecord(
-                            recordObj))
+                        if (recordDAL.InsertRecord(recordObj))
                         {
-                            printRecordInfo(recordObj.genre,
-                                recordObj.url,
-                                recordObj.artist,
-                                recordObj.name);
+                            printRecordInfo(recordObj);
+
                             string id = recordDAL.GetLatestId();
                             recordDAL.updateRecordPtah(id, downloadImage(recordObj.imgUrl, id, BaseDirectory)); //Update file path
                             recordDAL.insertTrackList(id, recordObj);
                             ctr++;
                         }
                     }
-                    recordObj.Dispose();
                 }
 
                 urlPath = getNextPage(htmlDoc);
@@ -121,25 +117,18 @@ namespace webScraper
             //scrape single record
             HtmlWeb web = new HtmlWeb();
             var htmlDoc = new HtmlDocument();
-                try
-                {
-                    htmlDoc = web.Load(url);
-                    record.label = getLabel(htmlDoc);
-                    record.country = getCountry(htmlDoc);
-                    record.released = getReleased(htmlDoc);
-                    record.tracklist = getTracks(htmlDoc);
-                    record.name = getRecordTitle(htmlDoc);
-                    record.artist = getArtist(htmlDoc);
-                    record.genre = getGenre(htmlDoc);
-                    record.url = urlPath;
-                    record.imgUrl = getImgUrl(htmlDoc);
-                    record.pathUrl = "PathUrl"; // placeholder
-                    return record;
-                }
-                catch (Exception)
-                {
-                    return record;
-                }
+            htmlDoc = web.Load(url);
+            record.label = getLabel(htmlDoc);
+            record.country = getCountry(htmlDoc);
+            record.released = getReleased(htmlDoc);
+            record.tracklist = getTracks(htmlDoc);
+            record.name = getRecordTitle(htmlDoc);
+            record.artist = getArtist(htmlDoc);
+            record.genre = getGenre(htmlDoc);
+            record.url = urlPath;
+            record.imgUrl = getImgUrl(htmlDoc);
+            record.pathUrl = "PathUrl"; // placeholder
+            return record;
         }
         private static string getNextPage(HtmlDocument htmlDoc)
         {
@@ -150,10 +139,9 @@ namespace webScraper
         #region GetRecordData
         private static string getGenre(HtmlDocument htmlDoc)
         {
-            var genre_ = htmlDoc.DocumentNode.Descendants("a")
+               return htmlDoc.DocumentNode.Descendants("a")
                 .Where(node => node.GetAttributeValue("href", "")
-                .Contains("/genre/")).ToList();
-            return genre_[0].InnerHtml;
+                .Contains("/genre/")).First().InnerHtml.ToString();
         }
         private static string getImgUrl(HtmlDocument htmlDoc)
         {
@@ -185,15 +173,29 @@ namespace webScraper
         }
         private static string getCountry(HtmlDocument htmlDoc)
         {
-            return htmlDoc.DocumentNode
+            try
+            {
+                return htmlDoc.DocumentNode
                 .SelectSingleNode("//*[@id=\"page_content\"]/div[1]/div[3]/div[6]/a")
                 .InnerText.Trim().ToString();
+            }
+            catch (Exception)
+            {
+                return "-";
+            }
         }
-        private static int getReleased(HtmlDocument htmlDoc)
+        private static string getReleased(HtmlDocument htmlDoc)
         {
-            return Int32.Parse(htmlDoc.DocumentNode
+            try
+            {
+                return htmlDoc.DocumentNode
                 .SelectSingleNode("//*[@id=\"page_content\"]/div[1]/div[3]/div[8]/a")
-                .InnerText.Trim().ToString());
+                .InnerText.Trim().ToString();
+            }
+            catch (Exception)
+            {
+                return "-";
+            }
         }
         private static List<track> getTracks(HtmlDocument htmlDoc)
         {
@@ -208,7 +210,7 @@ namespace webScraper
                 track track = new track();
                 var trackInfo = t.ChildNodes.Where(node => node.GetAttributeValue("class", "")
                     .Contains("track")).ToList();
-                track.number = Int32.Parse(trackInfo[0].InnerText.ToString());
+                track.number = trackInfo[0].InnerText.ToString(); //needs to be string
                 track.name = trackInfo[trackInfo.Count - 2].InnerText.ToString();
                 track.duration = trackInfo[trackInfo.Count - 1].InnerText.ToString().Trim();
                 //Console.WriteLine($"{track.number}, {track.name}, {track.duration}");
@@ -217,12 +219,27 @@ namespace webScraper
             return trackList;
         }
         #endregion
-        private static void printRecordInfo(string genre, string imgUrl, string artist, string recordTitle)
+        private static void printRecordInfo(record record)
         {
-            Console.WriteLine($"url: {imgUrl} \n" +
-                        $"record title: {recordTitle} \n" +
-                        $"artist: {artist} \n" +
-                        $"genre: {genre}\n");
+            Console.WriteLine($"url: \t\t{record.url} \n" +
+                        $"title: \t\t{record.name} \n" +
+                        $"artist: \t{record.artist} \n" +
+                        $"label: \t\t{record.label} \n" +
+                        $"country: \t{record.country} \n" +
+                        $"released: \t{record.released} \n" +
+                        $"genre: \t\t{record.genre} \n" +
+                        $"Tracks:");
+            printTracks(record);
+            Console.WriteLine();
+        }
+        private static void printTracks(record record)
+        {
+            foreach (track track in record.tracklist)
+            {
+                Console.WriteLine($"\t {track.number}" +
+                    $"\t {track.name}" +
+                    $"\t {track.duration}");
+            }
         }
         private static void Reset(string BaseDirrectory)
         {

@@ -8,7 +8,7 @@ namespace webScraper.Models
 {
     class track
     {
-        public int number { get; set; }
+        public string number { get; set; }
         public string name { get; set; }
         public string duration { get; set; }
         public int recordId { get; set; }
