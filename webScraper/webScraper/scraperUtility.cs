@@ -1,0 +1,48 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using webScraper.Models;
+using webScraper.DataOperations;
+
+namespace webScraper
+{
+    class scraperUtility
+    {
+        public void printRecordInfo(record record)
+        {
+            Console.WriteLine($"url: \t\t{record.url} \n" +
+                        $"title: \t\t{record.name} \n" +
+                        $"artist: \t{record.artist} \n" +
+                        $"label: \t\t{record.label} \n" +
+                        $"country: \t{record.country} \n" +
+                        $"released: \t{record.released} \n" +
+                        $"genre: \t\t{record.genre} \n" +
+                        $"Tracks:");
+            printTracks(record);
+            Console.WriteLine();
+        }
+        public void printTracks(record record)
+        {
+            foreach (track track in record.tracklist)
+            {
+                Console.WriteLine($"\t {track.number}" +
+                    $"\t {track.name}" +
+                    $"\t {track.duration}");
+            }
+        }
+        public void Reset(string BaseDirrectory)
+        {
+            recordsDataAccessLayer recordsDataAccessLayer = new recordsDataAccessLayer();
+            recordsDataAccessLayer.ResetDatabase();
+            try
+            {
+                System.IO.Directory.Delete(BaseDirrectory, true); // Deletes directory
+            }
+            catch
+            {
+            }
+        }
+    }
+}

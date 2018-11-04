@@ -511,6 +511,13 @@ namespace webScraper.DataOperations
                 cmd.CommandType = CommandType.Text;
                 cmd.ExecuteNonQuery();
             }
+            //Resets id for records
+            sql = "DBCC CHECKIDENT('tracks', RESEED, 0)";
+            using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
+            {
+                cmd.CommandType = CommandType.Text;
+                cmd.ExecuteNonQuery();
+            }
             //Deletes rows from tables
             sql = "DELETE FROM records";
             using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
