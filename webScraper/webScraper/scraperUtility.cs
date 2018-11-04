@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using webScraper.Models;
 using webScraper.DataOperations;
 
@@ -10,6 +6,7 @@ namespace webScraper
 {
     class scraperUtility
     {
+        //Utilities for development
         public void printRecordInfo(record record)
         {
             Console.WriteLine($"url: \t\t{record.url} \n" +
