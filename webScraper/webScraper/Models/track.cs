@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Net;
 
 namespace webScraper.Models
 {
@@ -14,7 +15,7 @@ namespace webScraper.Models
             var trackInfo = htmlNode.ChildNodes.Where(node => node.GetAttributeValue("class", "")
                     .Contains("track")).ToList();
             number = trackInfo[0].InnerText.ToString(); //needs to be string
-            name = trackInfo[trackInfo.Count - 2].InnerText.ToString();
+            name = WebUtility.HtmlDecode(trackInfo[trackInfo.Count - 2].InnerText.ToString());
             duration = trackInfo[trackInfo.Count - 1].InnerText.ToString().Trim();
         }
     }

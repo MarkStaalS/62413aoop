@@ -10,7 +10,7 @@
             utility.Reset(BaseDir);
 
             scraper discogsScraper = new scraper();
-            discogsScraper.getRecords(10, BaseDir);
+            discogsScraper.getRecords(20, BaseDir);
         }
     }
 }

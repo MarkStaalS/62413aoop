@@ -2,6 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
+using System.Web;
+using System.Net;
 
 namespace webScraper.Models
 {
@@ -37,9 +40,9 @@ namespace webScraper.Models
         }
         private static string getGenre(HtmlDocument htmlDoc)
         {
-            return htmlDoc.DocumentNode.Descendants("a")
+            return WebUtility.HtmlDecode(htmlDoc.DocumentNode.Descendants("a")
              .Where(node => node.GetAttributeValue("href", "")
-             .Contains("/genre/")).First().InnerHtml.ToString();
+             .Contains("/genre/")).First().InnerHtml.ToString());
         }
         private static string getImgUrl(HtmlDocument htmlDoc)
         {
@@ -54,20 +57,20 @@ namespace webScraper.Models
             var profileTitleNodes = htmlDoc.DocumentNode
                 .SelectSingleNode("//*[@id=\"profile_title\"]")
                 .ChildNodes.ToList();
-            return profileTitleNodes[1].InnerText.Trim();
+            return WebUtility.HtmlDecode(profileTitleNodes[1].InnerText.Trim());
         }
         private static string getRecordTitle(HtmlDocument htmlDoc)
         {
             var profileTitleNodes = htmlDoc.DocumentNode
                 .SelectSingleNode("//*[@id=\"profile_title\"]")
                 .ChildNodes.ToList();
-            return profileTitleNodes[profileTitleNodes.Count - 2].InnerText.Trim();
+            return WebUtility.HtmlDecode(profileTitleNodes[profileTitleNodes.Count - 2].InnerText.Trim());
         }
         private static string getLabel(HtmlDocument htmlDoc)
         {
-            return htmlDoc.DocumentNode
+            return WebUtility.HtmlDecode(htmlDoc.DocumentNode
                 .SelectSingleNode("//*[@id=\"page_content\"]/div[1]/div[3]/div[2]/a")
-                .InnerText.ToString();
+                .InnerText.ToString());
         }
         private static string getCountry(HtmlDocument htmlDoc)
         {
