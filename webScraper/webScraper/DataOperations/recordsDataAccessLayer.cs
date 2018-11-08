@@ -35,8 +35,16 @@ namespace webScraper.DataOperations
             //Checks weather the record exsists in the table if not adds it
             if (!RecordExsists(record))
             {
-                //lav til funktion
-                string sql = "INSERT INTO records" +
+                //Resets the autoincrementing primary key of the records table to ensure no gaps
+                string sql = "DECLARE @MaxId AS INT " +
+                "SELECT @MaxId = (SELECT TOP 1 Id FROM records ORDER BY Id DESC) " +
+                "IF(@MaxId > 0) DBCC CHECKIDENT('records', RESEED, @MaxId)";
+                using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
+                {
+                    cmd.CommandType = CommandType.Text;
+                    cmd.ExecuteNonQuery();
+                }
+                sql = "INSERT INTO records" +
                 "(name, artist, genre, url, pathUrl, country, label, released)" +
                 "VALUES" +
                 "(@name, @artist, @genre, @url, @pathUrl, @country, @label, @released)";
