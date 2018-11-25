@@ -29,6 +29,10 @@ namespace webScraper
                     $"\t {track.duration}");
             }
         }
+        public void createDir(string BaseDirectory)
+        {
+            System.IO.Directory.CreateDirectory(BaseDirectory); // Creates directory if it not already exists.
+        }
         public void Reset(string BaseDirrectory)
         {
             recordsDataAccessLayer recordsDataAccessLayer = new recordsDataAccessLayer();

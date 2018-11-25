@@ -2,18 +2,27 @@
 using System.Configuration;
 using System.Data.SqlClient;
 using webScraper.Models;
+using System;
 
 namespace webScraper.DataOperations
 {
     class recordsDataAccessLayer
     {
         private SqlConnection _SqlConnection = null;
-        private readonly string _connectionString = ConfigurationManager.AppSettings["connectionString"];
+
+        private string getConnectionString() //Uses current directory to set the path for the database
+        {
+            string appConfig = Environment.CurrentDirectory; 
+            appConfig = appConfig.Replace("\\bin\\Debug", "\\records.mdf"); //Gets directory for the database
+            string connectionStringSection = ConfigurationManager.AppSettings["connectionString"]; //Gets current connectionstring with placeholder
+            connectionStringSection = connectionStringSection.Replace("@ConnectionString", appConfig); //Changes placeholder to current path
+            return connectionStringSection;
+        }
         private void OpenConnection()
         {
             _SqlConnection = new SqlConnection()
             {
-                ConnectionString = _connectionString
+                ConnectionString = getConnectionString()
             };
             _SqlConnection.Open();
         }
@@ -38,7 +47,8 @@ namespace webScraper.DataOperations
                 //Resets the autoincrementing primary key of the records table to ensure no gaps
                 string sql = "DECLARE @MaxId AS INT " +
                 "SELECT @MaxId = (SELECT TOP 1 Id FROM records ORDER BY Id DESC) " +
-                "IF(@MaxId > 0) DBCC CHECKIDENT('records', RESEED, @MaxId)";
+                "IF(@MaxId > 1) " +
+                "DBCC CHECKIDENT('records', RESEED, @MaxId)";
                 using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
                 {
                     cmd.CommandType = CommandType.Text;

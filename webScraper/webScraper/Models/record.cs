@@ -8,7 +8,7 @@ using System.Net;
 
 namespace webScraper.Models
 {
-    class record
+    class record : IDisposable
     {
         public string name { get; set; }
         public string artist { get; set; }
@@ -112,6 +112,10 @@ namespace webScraper.Models
                 trackList.Add(track);
             }
             return trackList;
+        }
+        public void Dispose()
+        {
+
         }
     }
 }

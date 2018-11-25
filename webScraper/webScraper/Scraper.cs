@@ -38,28 +38,29 @@ namespace webScraper
 
                     string recordUrlPath = listItem.GetAttributeValue("href", "").ToString(); //url to record page
 
-                    record recordObj = new record();
-                    recordObj.setRecord(url + recordUrlPath, recordUrlPath, recordObj);
+                    using (record recordObj = new record())
+                    {
+                        recordObj.setRecord(url + recordUrlPath, recordUrlPath, recordObj);
 
-                    if (recordObj.genre == null || recordObj.imgUrl == "thumbnail_border")
-                    {
-                        Console.WriteLine("Error\n");
-                    }
-                    else
-                    {
-                        //Checks weather or not the record has been added and weather to download cover image
-                        if (recordsDataAccessLayer.InsertRecord(recordObj))
+                        if (recordObj.genre == null || recordObj.imgUrl == "thumbnail_border")
                         {
-                            utility.printRecordInfo(recordObj);
+                            Console.WriteLine("Error\n");
+                        }
+                        else
+                        {
+                            //Checks weather or not the record has been added and weather to download cover image
+                            if (recordsDataAccessLayer.InsertRecord(recordObj))
+                            {
+                                utility.printRecordInfo(recordObj);
 
-                            string id = recordsDataAccessLayer.GetLatestId();
-                            recordsDataAccessLayer.updateRecordPtah(id, downloadImage(recordObj.imgUrl, id, BaseDirectory)); //Update file path
-                            recordsDataAccessLayer.insertTrackList(id, recordObj);
-                            ctr++;
+                                string id = recordsDataAccessLayer.GetLatestId();
+                                recordsDataAccessLayer.updateRecordPtah(id, downloadImage(recordObj.imgUrl, id, BaseDirectory)); //Update file path
+                                recordsDataAccessLayer.insertTrackList(id, recordObj);
+                                ctr++;
+                            }
                         }
                     }
                 }
-
                 urlPath = getNextPage(htmlDoc);
 
                 Console.WriteLine($"\n *** next page: {urlPath} count:{ctr}*** \n");
@@ -69,8 +70,6 @@ namespace webScraper
         }
         private static string downloadImage(string imgUrl, string id, string BaseDirectory)
         {
-            System.IO.Directory.CreateDirectory(BaseDirectory); // Creates directory if it not already exists.
-
             using (WebClient web = new WebClient())
             {
                 web.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
