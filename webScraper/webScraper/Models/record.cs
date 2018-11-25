@@ -2,49 +2,47 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.IO;
-using System.Web;
 using System.Net;
 
 namespace webScraper.Models
 {
-    class record : IDisposable
+    class Record : IDisposable
     {
-        public string name { get; set; }
-        public string artist { get; set; }
-        public string genre { get; set; }
-        public string imgUrl { get; set; }
-        public string url { get; set; }
-        public string pathUrl { get; set; }
-        public string country { get; set; }
-        public string label { get; set; }
-        public string released { get; set; }
-        public List<track> tracklist { get; set; }
+        public string Name { get; set; }
+        public string Artist { get; set; }
+        public string Genre { get; set; }
+        public string ImgUrl { get; set; }
+        public string Url { get; set; }
+        public string PathUrl { get; set; }
+        public string Country { get; set; }
+        public string Label { get; set; }
+        public string Released { get; set; }
+        public List<Track> Tracklist { get; set; }
 
-        public void setRecord(string url, string urlPath, record record)
+        public void SetRecord(string url, string urlPath, Record record)
         {
             //scrape single record
             HtmlWeb web = new HtmlWeb();
             var htmlDoc = new HtmlDocument();
             htmlDoc = web.Load(url);
-            record.label = getLabel(htmlDoc);
-            record.country = getCountry(htmlDoc);
-            record.released = getReleased(htmlDoc);
-            record.tracklist = getTracks(htmlDoc);
-            record.name = getRecordTitle(htmlDoc);
-            record.artist = getArtist(htmlDoc);
-            record.genre = getGenre(htmlDoc);
-            record.url = urlPath;
-            record.imgUrl = getImgUrl(htmlDoc);
-            record.pathUrl = "PathUrl"; // placeholder
+            record.Label = GetLabel(htmlDoc);
+            record.Country = GetCountry(htmlDoc);
+            record.Released = GetReleased(htmlDoc);
+            record.Tracklist = GetTracks(htmlDoc);
+            record.Name = GetRecordTitle(htmlDoc);
+            record.Artist = GetArtist(htmlDoc);
+            record.Genre = GetGenre(htmlDoc);
+            record.Url = urlPath;
+            record.ImgUrl = GetImgUrl(htmlDoc);
+            record.PathUrl = "PathUrl"; // placeholder
         }
-        private static string getGenre(HtmlDocument htmlDoc)
+        private static string GetGenre(HtmlDocument htmlDoc)
         {
             return WebUtility.HtmlDecode(htmlDoc.DocumentNode.Descendants("a")
              .Where(node => node.GetAttributeValue("href", "")
              .Contains("/genre/")).First().InnerHtml.ToString());
         }
-        private static string getImgUrl(HtmlDocument htmlDoc)
+        private static string GetImgUrl(HtmlDocument htmlDoc)
         {
             var pageContentNodes = htmlDoc.DocumentNode
                 .SelectSingleNode("//*[@id=\"page_content\"]/div[1]/div[1]/a")
@@ -52,27 +50,27 @@ namespace webScraper.Models
             string[] imgUrl_ = pageContentNodes[pageContentNodes.Count - 2].InnerHtml.Split('\"');
             return imgUrl_[1];
         }
-        private static string getArtist(HtmlDocument htmlDoc)
+        private static string GetArtist(HtmlDocument htmlDoc)
         {
             var profileTitleNodes = htmlDoc.DocumentNode
                 .SelectSingleNode("//*[@id=\"profile_title\"]")
                 .ChildNodes.ToList();
             return WebUtility.HtmlDecode(profileTitleNodes[1].InnerText.Trim());
         }
-        private static string getRecordTitle(HtmlDocument htmlDoc)
+        private static string GetRecordTitle(HtmlDocument htmlDoc)
         {
             var profileTitleNodes = htmlDoc.DocumentNode
                 .SelectSingleNode("//*[@id=\"profile_title\"]")
                 .ChildNodes.ToList();
             return WebUtility.HtmlDecode(profileTitleNodes[profileTitleNodes.Count - 2].InnerText.Trim());
         }
-        private static string getLabel(HtmlDocument htmlDoc)
+        private static string GetLabel(HtmlDocument htmlDoc)
         {
             return WebUtility.HtmlDecode(htmlDoc.DocumentNode
                 .SelectSingleNode("//*[@id=\"page_content\"]/div[1]/div[3]/div[2]/a")
                 .InnerText.ToString());
         }
-        private static string getCountry(HtmlDocument htmlDoc)
+        private static string GetCountry(HtmlDocument htmlDoc)
         {
             try
             {
@@ -85,7 +83,7 @@ namespace webScraper.Models
                 return "-";
             }
         }
-        private static string getReleased(HtmlDocument htmlDoc)
+        private static string GetReleased(HtmlDocument htmlDoc)
         {
             try
             {
@@ -98,21 +96,22 @@ namespace webScraper.Models
                 return "-";
             }
         }
-        private static List<track> getTracks(HtmlDocument htmlDoc)
+        private static List<Track> GetTracks(HtmlDocument htmlDoc)
         {
             //Get tracks from the record and returns them in a list
-            List<track> trackList = new List<track>();
+            List<Track> trackList = new List<Track>();
             var htmlTrackList = htmlDoc.DocumentNode.Descendants("tr")
                 .Where(node => node.GetAttributeValue("class", "")
                     .Contains("track")).ToList();
             foreach (HtmlAgilityPack.HtmlNode htmlNode in htmlTrackList)
             {
-                track track = new track();
-                track.setTrack(htmlNode);
+                Track track = new Track();
+                track.SetTrack(htmlNode);
                 trackList.Add(track);
             }
             return trackList;
         }
+        //IDisposable Interface
         public void Dispose()
         {
 

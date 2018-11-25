@@ -3,20 +3,20 @@ using System.Net;
 
 namespace webScraper.Models
 {
-    class track
+    class Track
     {
-        public string number { get; set; }
-        public string name { get; set; }
-        public string duration { get; set; }
-        public int recordId { get; set; }
+        public string Number { get; set; }
+        public string Name { get; set; }
+        public string Duration { get; set; }
+        public int RecordId { get; set; }
 
-        public void setTrack(HtmlAgilityPack.HtmlNode htmlNode)
+        public void SetTrack(HtmlAgilityPack.HtmlNode htmlNode)
         {
             var trackInfo = htmlNode.ChildNodes.Where(node => node.GetAttributeValue("class", "")
                     .Contains("track")).ToList();
-            number = trackInfo[0].InnerText.ToString(); //needs to be string
-            name = WebUtility.HtmlDecode(trackInfo[trackInfo.Count - 2].InnerText.ToString());
-            duration = trackInfo[trackInfo.Count - 1].InnerText.ToString().Trim();
+            Number = trackInfo[0].InnerText.ToString(); //needs to be string
+            Name = WebUtility.HtmlDecode(trackInfo[trackInfo.Count - 2].InnerText.ToString());
+            Duration = trackInfo[trackInfo.Count - 1].InnerText.ToString().Trim();
         }
     }
 }

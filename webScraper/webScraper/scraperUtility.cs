@@ -7,35 +7,35 @@ namespace webScraper
     class scraperUtility
     {
         //Utilities for development
-        public void printRecordInfo(record record)
+        public void PrintRecordInfo(Record record)
         {
-            Console.WriteLine($"url: \t\t{record.url} \n" +
-                        $"title: \t\t{record.name} \n" +
-                        $"artist: \t{record.artist} \n" +
-                        $"label: \t\t{record.label} \n" +
-                        $"country: \t{record.country} \n" +
-                        $"released: \t{record.released} \n" +
-                        $"genre: \t\t{record.genre} \n" +
+            Console.WriteLine($"url: \t\t{record.Url} \n" +
+                        $"title: \t\t{record.Name} \n" +
+                        $"artist: \t{record.Artist} \n" +
+                        $"label: \t\t{record.Label} \n" +
+                        $"country: \t{record.Country} \n" +
+                        $"released: \t{record.Released} \n" +
+                        $"genre: \t\t{record.Genre} \n" +
                         $"Tracks:");
-            printTracks(record);
+            PrintTracks(record);
             Console.WriteLine();
         }
-        public void printTracks(record record)
+        public void PrintTracks(Record record)
         {
-            foreach (track track in record.tracklist)
+            foreach (Track track in record.Tracklist)
             {
-                Console.WriteLine($"\t {track.number}" +
-                    $"\t {track.name}" +
-                    $"\t {track.duration}");
+                Console.WriteLine($"\t {track.Number}" +
+                    $"\t {track.Name}" +
+                    $"\t {track.Duration}");
             }
         }
-        public void createDir(string BaseDirectory)
+        public void CreateDir(string BaseDirectory)
         {
             System.IO.Directory.CreateDirectory(BaseDirectory); // Creates directory if it not already exists.
         }
         public void Reset(string BaseDirrectory)
         {
-            recordsDataAccessLayer recordsDataAccessLayer = new recordsDataAccessLayer();
+            RecordsDataAccessLayer recordsDataAccessLayer = new RecordsDataAccessLayer();
             recordsDataAccessLayer.ResetDatabase();
             try
             {

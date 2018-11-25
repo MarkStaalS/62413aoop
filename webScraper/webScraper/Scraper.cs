@@ -7,7 +7,7 @@ using webScraper.Models;
 
 namespace webScraper
 {
-    class scraper
+    class Scraper
     {
         public void getRecords(int maxCtr, string BaseDirectory)
         {
@@ -16,7 +16,7 @@ namespace webScraper
             string urlPath = @"/search/?type=release";//path url first page
 
             scraperUtility utility = new scraperUtility();
-            recordsDataAccessLayer recordsDataAccessLayer = new recordsDataAccessLayer();
+            RecordsDataAccessLayer recordsDataAccessLayer = new RecordsDataAccessLayer();
             int ctr = 0;
             while (ctr < maxCtr)
             {
@@ -38,11 +38,11 @@ namespace webScraper
 
                     string recordUrlPath = listItem.GetAttributeValue("href", "").ToString(); //url to record page
 
-                    using (record recordObj = new record())
+                    using (Record recordObj = new Record())
                     {
-                        recordObj.setRecord(url + recordUrlPath, recordUrlPath, recordObj);
+                        recordObj.SetRecord(url + recordUrlPath, recordUrlPath, recordObj);
 
-                        if (recordObj.genre == null || recordObj.imgUrl == "thumbnail_border")
+                        if (recordObj.Genre == null || recordObj.ImgUrl == "thumbnail_border")
                         {
                             Console.WriteLine("Error\n");
                         }
@@ -51,24 +51,24 @@ namespace webScraper
                             //Checks weather or not the record has been added and weather to download cover image
                             if (recordsDataAccessLayer.InsertRecord(recordObj))
                             {
-                                utility.printRecordInfo(recordObj);
+                                utility.PrintRecordInfo(recordObj);
 
                                 string id = recordsDataAccessLayer.GetLatestId();
-                                recordsDataAccessLayer.updateRecordPtah(id, downloadImage(recordObj.imgUrl, id, BaseDirectory)); //Update file path
-                                recordsDataAccessLayer.insertTrackList(id, recordObj);
+                                recordsDataAccessLayer.updateRecordPtah(id, DownloadImage(recordObj.ImgUrl, id, BaseDirectory)); //Update file path
+                                recordsDataAccessLayer.InsertTrackList(id, recordObj);
                                 ctr++;
                             }
                         }
                     }
                 }
-                urlPath = getNextPage(htmlDoc);
+                urlPath = GetNextPage(htmlDoc);
 
                 Console.WriteLine($"\n *** next page: {urlPath} count:{ctr}*** \n");
             }
             Console.WriteLine("done");
             Console.ReadLine();
         }
-        private static string downloadImage(string imgUrl, string id, string BaseDirectory)
+        private static string DownloadImage(string imgUrl, string id, string BaseDirectory)
         {
             using (WebClient web = new WebClient())
             {
@@ -86,7 +86,7 @@ namespace webScraper
             }
 
         }
-        private static string getNextPage(HtmlDocument htmlDoc)
+        private static string GetNextPage(HtmlDocument htmlDoc)
         {
             return htmlDoc.DocumentNode
                     .SelectSingleNode("//*[@id=\"pjax_container\"]/div[3]/form/div[1]/ul/li[2]/a")

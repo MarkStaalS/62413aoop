@@ -11,11 +11,11 @@ namespace webScraper
         {
             string BaseDir = @"C:\Users\@UserName\Desktop\test\"; //folder for the images usig username
             BaseDir = BaseDir.Replace("@UserName", Environment.UserName);
-            scraperUtility utility = new scraperUtility();
-            utility.Reset(BaseDir);
-            utility.createDir(BaseDir);
+            scraperUtility Utility = new scraperUtility();
+            Utility.Reset(BaseDir);
+            Utility.CreateDir(BaseDir);
 
-            scraper discogsScraper = new scraper();
+            Scraper discogsScraper = new Scraper();
             discogsScraper.getRecords(20, BaseDir);
         }
     }
