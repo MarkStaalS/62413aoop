@@ -9,20 +9,20 @@ namespace webScraper
 {
     class Scraper
     {
-        public void getRecords(int maxCtr, string BaseDirectory)
+        public void GetRecords(int maxCtr, string BaseDirectory)
         {
             // scrapes website and gets record information and link to image
             string url = @"https://www.discogs.com"; //Base url
             string urlPath = @"/search/?type=release";//path url first page
 
             scraperUtility utility = new scraperUtility();
-            RecordsDataAccessLayer recordsDataAccessLayer = new RecordsDataAccessLayer();
+            RecordsDataAccessLayer RecordsDataAccessLayer = new RecordsDataAccessLayer();
             int ctr = 0;
             while (ctr < maxCtr)
             {
                 HtmlWeb web = new HtmlWeb();
                 HtmlDocument htmlDoc = web.Load(url + urlPath);
-
+                //Explain lambda functions
                 var recordList = htmlDoc.DocumentNode.Descendants("div") //Html attributes containing list of records
                     .Where(node => node.GetAttributeValue("id", "")
                     .Equals("search_results")).ToList();
@@ -49,13 +49,13 @@ namespace webScraper
                         else
                         {
                             //Checks weather or not the record has been added and weather to download cover image
-                            if (recordsDataAccessLayer.InsertRecord(recordObj))
+                            if (RecordsDataAccessLayer.InsertRecord(recordObj))
                             {
                                 utility.PrintRecordInfo(recordObj);
 
-                                string id = recordsDataAccessLayer.GetLatestId();
-                                recordsDataAccessLayer.updateRecordPtah(id, DownloadImage(recordObj.ImgUrl, id, BaseDirectory)); //Update file path
-                                recordsDataAccessLayer.InsertTrackList(id, recordObj);
+                                string id = RecordsDataAccessLayer.GetLatestId();
+                                RecordsDataAccessLayer.updateRecordPtah(id, DownloadImage(recordObj.ImgUrl, id, BaseDirectory)); //Update file path
+                                RecordsDataAccessLayer.InsertTrackList(id, recordObj);
                                 ctr++;
                             }
                         }

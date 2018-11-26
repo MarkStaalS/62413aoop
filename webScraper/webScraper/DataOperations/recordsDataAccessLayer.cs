@@ -18,6 +18,7 @@ namespace webScraper.DataOperations
             connectionStringSection = connectionStringSection.Replace("@ConnectionString", appConfig); //Changes placeholder to current path
             return connectionStringSection;
         }
+        //Reference book pro C# 7 ...
         private void OpenConnection()
         {
             _SqlConnection = new SqlConnection()
@@ -49,85 +50,84 @@ namespace webScraper.DataOperations
                 "SELECT @MaxId = (SELECT TOP 1 Id FROM records ORDER BY Id DESC) " +
                 "IF(@MaxId > 1) " +
                 "DBCC CHECKIDENT('records', RESEED, @MaxId)";
-                using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
+                using (SqlCommand SqlCommand = new SqlCommand(sql, _SqlConnection))
                 {
-                    cmd.CommandType = CommandType.Text;
-                    cmd.ExecuteNonQuery();
+                    SqlCommand.CommandType = CommandType.Text;
+                    SqlCommand.ExecuteNonQuery();
                 }
                 sql = "INSERT INTO records" +
                 "(name, artist, genre, url, pathUrl, country, label, released)" +
                 "VALUES" +
                 "(@name, @artist, @genre, @url, @pathUrl, @country, @label, @released)";
-
-                using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
+                using (SqlCommand SqlCommand = new SqlCommand(sql, _SqlConnection))
                 {
-                    SqlParameter parameter = new SqlParameter
+                    SqlParameter Parameter = new SqlParameter
                     {
                         ParameterName = "@name",
                         Value = record.Name,
                         SqlDbType = SqlDbType.Char
                     };
-                    cmd.Parameters.Add(parameter);
+                    SqlCommand.Parameters.Add(Parameter);
 
-                    parameter = new SqlParameter
+                    Parameter = new SqlParameter
                     {
                         ParameterName = "@artist",
                         Value = record.Artist,
                         SqlDbType = SqlDbType.Char
                     };
-                    cmd.Parameters.Add(parameter);
+                    SqlCommand.Parameters.Add(Parameter);
 
-                    parameter = new SqlParameter
+                    Parameter = new SqlParameter
                     {
                         ParameterName = "@genre",
                         Value = record.Genre,
                         SqlDbType = SqlDbType.Char
                     };
-                    cmd.Parameters.Add(parameter);
+                    SqlCommand.Parameters.Add(Parameter);
 
-                    parameter = new SqlParameter
+                    Parameter = new SqlParameter
                     {
                         ParameterName = "@url",
                         Value = record.Url,
                         SqlDbType = SqlDbType.Char
                     };
-                    cmd.Parameters.Add(parameter);
+                    SqlCommand.Parameters.Add(Parameter);
 
-                    parameter = new SqlParameter
+                    Parameter = new SqlParameter
                     {
                         ParameterName = "@pathUrl",
                         Value = record.PathUrl,
                         SqlDbType = SqlDbType.Char
                     };
-                    cmd.Parameters.Add(parameter);
+                    SqlCommand.Parameters.Add(Parameter);
 
-                    parameter = new SqlParameter
+                    Parameter = new SqlParameter
                     {
                         ParameterName = "@country",
                         Value = record.Country,
                         SqlDbType = SqlDbType.Char
                     };
-                    cmd.Parameters.Add(parameter);
+                    SqlCommand.Parameters.Add(Parameter);
 
-                    parameter = new SqlParameter
+                    Parameter = new SqlParameter
                     {
                         ParameterName = "@label",
                         Value = record.Label,
                         SqlDbType = SqlDbType.Char
                     };
-                    cmd.Parameters.Add(parameter);
+                    SqlCommand.Parameters.Add(Parameter);
 
-                    parameter = new SqlParameter
+                    Parameter = new SqlParameter
                     {
                         ParameterName = "@released",
                         Value = record.Released,
                         SqlDbType = SqlDbType.Char
                     };
-                    cmd.Parameters.Add(parameter);
-                    cmd.CommandType = CommandType.Text;
+                    SqlCommand.Parameters.Add(Parameter);
+                    SqlCommand.CommandType = CommandType.Text;
                     try //Error handling
                     {
-                        cmd.ExecuteNonQuery();
+                        SqlCommand.ExecuteNonQuery();
                         CloseConnection();
                         return true;
                     }
@@ -250,10 +250,10 @@ namespace webScraper.DataOperations
         {
             foreach (Track track in record.Tracklist)
             {
-                insertTrack(id, track);
+                InsertTrack(id, track);
             }
         }
-        private void insertTrack(string id, Track track)
+        private void InsertTrack(string id, Track track)
         {
             OpenConnection();
 
