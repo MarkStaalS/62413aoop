@@ -10,7 +10,7 @@ namespace webScraper.DataOperations
     {
         private SqlConnection _SqlConnection = null;
 
-        private string getConnectionString() //Uses current directory to set the path for the database
+        private string GetConnectionString() //Uses current directory to set the path for the database
         {
             string appConfig = Environment.CurrentDirectory; 
             appConfig = appConfig.Replace("\\bin\\Debug", "\\records.mdf"); //Gets directory for the database
@@ -23,7 +23,7 @@ namespace webScraper.DataOperations
         {
             _SqlConnection = new SqlConnection()
             {
-                ConnectionString = getConnectionString()
+                ConnectionString = GetConnectionString()
             };
             _SqlConnection.Open();
         }
@@ -42,7 +42,7 @@ namespace webScraper.DataOperations
             InsertArtist(record.Artist);
             InsertCountry(record.Country);
             InsertLabel(record.Label);
-            //Checks weather the record exsists in the table if not adds it
+            //Checks weather the record exsists in the table if not, adds it
             if (!RecordExsists(record))
             {
                 //Resets the autoincrementing primary key of the records table to ensure no gaps
@@ -483,7 +483,7 @@ namespace webScraper.DataOperations
         }
         #endregion
         #region SQL update
-        public void updateRecordPtah(string Id, string RecordPath)
+        public void UpdateRecordPtah(string Id, string RecordPath)
         {
             //Checks weather the artist exsists in the table if not adds it
             string sql;

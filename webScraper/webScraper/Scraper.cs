@@ -30,18 +30,19 @@ namespace webScraper
                 var listItems = recordList[0].Descendants("a") //List of record links
                     .Where(node => node.GetAttributeValue("class", "")
                     .Equals("search_result_title")).ToList();
-
+                //list
                 foreach (var listItem in listItems)
                 {
                     if (ctr >= maxCtr)
                         break;
-
+                    //set record
+                    //addd to list
                     string recordUrlPath = listItem.GetAttributeValue("href", "").ToString(); //url to record page
 
                     using (Record recordObj = new Record())
                     {
                         recordObj.SetRecord(url + recordUrlPath, recordUrlPath, recordObj);
-
+                       
                         if (recordObj.Genre == null || recordObj.ImgUrl == "thumbnail_border")
                         {
                             Console.WriteLine("Error\n");
@@ -54,13 +55,15 @@ namespace webScraper
                                 utility.PrintRecordInfo(recordObj);
 
                                 string id = RecordsDataAccessLayer.GetLatestId();
-                                RecordsDataAccessLayer.updateRecordPtah(id, DownloadImage(recordObj.ImgUrl, id, BaseDirectory)); //Update file path
+                                RecordsDataAccessLayer.UpdateRecordPtah(id, DownloadImage(recordObj.ImgUrl, id, BaseDirectory)); //Update file path
                                 RecordsDataAccessLayer.InsertTrackList(id, recordObj);
                                 ctr++;
                             }
                         }
                     }
                 }
+                //post
+                //flush
                 urlPath = GetNextPage(htmlDoc);
 
                 Console.WriteLine($"\n *** next page: {urlPath} count:{ctr}*** \n");

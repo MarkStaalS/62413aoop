@@ -9,6 +9,7 @@ namespace webScraper
     {
         static void Main(string[] args)
         {
+            //args[] -How many records -Optional custom path for images
             string BaseDir = @"C:\Users\@UserName\Desktop\test\"; //folder for the images usig username
             BaseDir = BaseDir.Replace("@UserName", Environment.UserName);
             scraperUtility Utility = new scraperUtility();
