@@ -76,7 +76,6 @@ namespace webScraper.DataOperations
                         SqlDbType = SqlDbType.Char
                     };
                     SqlCommand.Parameters.Add(Parameter);
-
                     Parameter = new SqlParameter
                     {
                         ParameterName = "@genre",
@@ -133,6 +132,13 @@ namespace webScraper.DataOperations
                     }
                     catch
                     {
+                        //Print sql query
+                        //string query = SqlCommand.CommandText;
+                        //foreach (SqlParameter p in SqlCommand.Parameters)
+                        //{
+                        //    query = query.Replace(p.ParameterName, p.Value.ToString());
+                        //}
+                        //Console.WriteLine($"{query}");
                         CloseConnection();
                         return false;
                     }
