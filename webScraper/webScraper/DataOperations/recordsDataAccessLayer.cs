@@ -6,6 +6,9 @@ using System;
 
 namespace webScraper.DataOperations
 {
+    /// <summary>
+    /// Provides a interface for inserting records into the database
+    /// </summary>
     class RecordsDataAccessLayer
     {
         private SqlConnection _SqlConnection = null;
@@ -56,9 +59,9 @@ namespace webScraper.DataOperations
                     SqlCommand.ExecuteNonQuery();
                 }
                 sql = "INSERT INTO records" +
-                "(name, artist, genre, url, pathUrl, country, label, released)" +
+                "(name, artist, genre, pathUrl, country, label, released)" +
                 "VALUES" +
-                "(@name, @artist, @genre, @url, @pathUrl, @country, @label, @released)";
+                "(@name, @artist, @genre, @pathUrl, @country, @label, @released)";
                 using (SqlCommand SqlCommand = new SqlCommand(sql, _SqlConnection))
                 {
                     SqlParameter Parameter = new SqlParameter
@@ -83,15 +86,7 @@ namespace webScraper.DataOperations
                         SqlDbType = SqlDbType.Char
                     };
                     SqlCommand.Parameters.Add(Parameter);
-
-                    Parameter = new SqlParameter
-                    {
-                        ParameterName = "@url",
-                        Value = record.Url,
-                        SqlDbType = SqlDbType.Char
-                    };
-                    SqlCommand.Parameters.Add(Parameter);
-
+                    
                     Parameter = new SqlParameter
                     {
                         ParameterName = "@pathUrl",
@@ -132,13 +127,14 @@ namespace webScraper.DataOperations
                     }
                     catch
                     {
-                        //Print sql query
+                        ////Print sql query
                         //string query = SqlCommand.CommandText;
                         //foreach (SqlParameter p in SqlCommand.Parameters)
                         //{
-                        //    query = query.Replace(p.ParameterName, p.Value.ToString());
+                        //    query = query.Replace(p.ParameterName, $"'{p.Value.ToString()}'");
                         //}
                         //Console.WriteLine($"{query}");
+                        Console.WriteLine("Error: DB Error");
                         CloseConnection();
                         return false;
                     }
@@ -340,7 +336,7 @@ namespace webScraper.DataOperations
         private bool RecordExsists(Record record)
         {
             string sql = $"SELECT * FROM records WHERE (name = @name AND " +
-                $"artist = @artist AND genre = @genre AND url = @url)";
+                $"artist = @artist AND genre = @genre)";
             using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
             {
                 SqlParameter parameter = new SqlParameter
@@ -363,14 +359,6 @@ namespace webScraper.DataOperations
                 {
                     ParameterName = "@genre",
                     Value = record.Genre,
-                    SqlDbType = SqlDbType.Char
-                };
-                cmd.Parameters.Add(parameter);
-
-                parameter = new SqlParameter
-                {
-                    ParameterName = "@url",
-                    Value = record.Url,
                     SqlDbType = SqlDbType.Char
                 };
                 cmd.Parameters.Add(parameter);

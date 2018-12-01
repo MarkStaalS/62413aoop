@@ -7,6 +7,9 @@ using webScraper.Models;
 
 namespace webScraper
 {
+    /// <summary>
+    /// Class that scrapes the required amount of records from discogs.com, adds them to a database and downloads the albumcover if present to a specified directory.
+    /// </summary>
     class Scraper
     {
         public void GetRecords(int maxCtr, string BaseDirectory)
@@ -18,57 +21,79 @@ namespace webScraper
             scraperUtility utility = new scraperUtility();
             RecordsDataAccessLayer RecordsDataAccessLayer = new RecordsDataAccessLayer();
             int ctr = 0;
+            int errorCtr = 0;
             while (ctr < maxCtr)
             {
                 HtmlWeb web = new HtmlWeb();
-                HtmlDocument htmlDoc = web.Load(url + urlPath);
-                //Explain lambda functions
-                var recordList = htmlDoc.DocumentNode.Descendants("div") //Html attributes containing list of records
-                    .Where(node => node.GetAttributeValue("id", "")
-                    .Equals("search_results")).ToList();
-
-                var listItems = recordList[0].Descendants("a") //List of record links
-                    .Where(node => node.GetAttributeValue("class", "")
-                    .Equals("search_result_title")).ToList();
-                //list
-                foreach (var listItem in listItems)
+                try
                 {
-                    if (ctr >= maxCtr)
-                        break;
-                    //set record
-                    //addd to list
-                    string recordUrlPath = listItem.GetAttributeValue("href", "").ToString(); //url to record page
+                    HtmlDocument htmlDoc = web.Load(url + urlPath);
+                    //Explain lambda functions
+                    var recordList = htmlDoc.DocumentNode.Descendants("div") //Html attributes containing list of records
+                        .Where(node => node.GetAttributeValue("id", "")
+                        .Equals("search_results")).ToList();
 
-                    using (Record recordObj = new Record())
+                    var listItems = recordList[0].Descendants("a") //List of record links
+                        .Where(node => node.GetAttributeValue("class", "")
+                        .Equals("search_result_title")).ToList();
+                    //list
+                    foreach (var listItem in listItems)
                     {
-                        recordObj.SetRecord(url + recordUrlPath, recordUrlPath, recordObj);
-                       
-                        if (recordObj.Genre == null || recordObj.ImgUrl == "thumbnail_border")
-                        {
-                            Console.WriteLine("Error\n");
-                        }
-                        else
-                        {
-                            //Checks weather or not the record has been added and weather to download cover image
-                            if (RecordsDataAccessLayer.InsertRecord(recordObj))
-                            {
-                                utility.PrintRecordInfo(recordObj);
+                        if (ctr >= maxCtr)
+                            break;
+                        //set record
+                        //addd to list
+                        string recordUrlPath = listItem.GetAttributeValue("href", "").ToString(); //url to record page
 
-                                string id = RecordsDataAccessLayer.GetLatestId();
-                                RecordsDataAccessLayer.UpdateRecordPtah(id, DownloadImage(recordObj.ImgUrl, id, BaseDirectory)); //Update file path
-                                RecordsDataAccessLayer.InsertTrackList(id, recordObj);
-                                ctr++;
+                        using (Record recordObj = new Record())
+                        {
+                            recordObj.SetRecord(url + recordUrlPath, recordUrlPath, recordObj);
+
+                            if (recordObj.Genre == null)
+                            {
+                                Console.WriteLine("Error: Genre = Null");
+                                errorCtr++;
+                            }
+                            else
+                            {
+                                //Checks weather or not the record has been added and weather to download cover image
+                                if (RecordsDataAccessLayer.InsertRecord(recordObj))
+                                {
+                                    //utility.PrintRecordInfo(recordObj);
+
+                                    string id = RecordsDataAccessLayer.GetLatestId();
+                                    //If there is no albumcover the path will be "-"
+                                    string path;
+                                    if (recordObj.ImgUrl == "thumbnail_border")
+                                    {
+                                        path = "-";
+                                    }
+                                    else
+                                    {
+                                        path = DownloadImage(recordObj.ImgUrl, id, BaseDirectory);
+                                    }
+                                    RecordsDataAccessLayer.UpdateRecordPtah(id, path); //Update file path
+                                    RecordsDataAccessLayer.InsertTrackList(id, recordObj);
+                                    ctr++;
+                                    Console.WriteLine("SUCC: " + recordObj.Name);
+                                }
+                                else
+                                {
+                                    errorCtr++;
+                                }
                             }
                         }
                     }
+                    urlPath = GetNextPage(htmlDoc);
                 }
-                //post
-                //flush
-                urlPath = GetNextPage(htmlDoc);
-
-                Console.WriteLine($"\n *** next page: {urlPath} count:{ctr}*** \n");
+                catch 
+                {
+                    Console.WriteLine("Failed to load web page");
+                    break;
+                }
+                Console.WriteLine($"Next page: {urlPath} count:{ctr}");
             }
-            Console.WriteLine("done");
+            Console.WriteLine($"Error rate {errorCtr} / {ctr}");
             Console.ReadLine();
         }
         private static string DownloadImage(string imgUrl, string id, string BaseDirectory)

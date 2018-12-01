@@ -3,13 +3,15 @@ using System.Net;
 
 namespace webScraper.Models
 {
+    /// <summary>
+    /// A class containing the relevant information regarding a single track
+    /// </summary>
     class Track
     {
         public string Number { get; set; }
         public string Name { get; set; }
         public string Duration { get; set; }
         public int RecordId { get; set; }
-
         public void SetTrack(HtmlAgilityPack.HtmlNode htmlNode)
         {
             var trackInfo = htmlNode.ChildNodes.Where(node => node.GetAttributeValue("class", "")

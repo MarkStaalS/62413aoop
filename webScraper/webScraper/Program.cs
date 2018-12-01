@@ -17,7 +17,7 @@ namespace webScraper
             Utility.CreateDir(BaseDir);
 
             Scraper discogsScraper = new Scraper();
-            discogsScraper.GetRecords(20, BaseDir);
+            discogsScraper.GetRecords(200, BaseDir);
         }
     }
 }

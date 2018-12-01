@@ -3,16 +3,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 
 namespace webScraper.Models
 {
+    /// <summary>
+    /// Class for setting and transfering record data
+    /// </summary>
     class Record : IDisposable
     {
         public string Name { get; set; }
         public string Artist { get; set; }
         public string Genre { get; set; }
         public string ImgUrl { get; set; }
-        public string Url { get; set; }
         public string PathUrl { get; set; }
         public string Country { get; set; }
         public string Label { get; set; }
@@ -24,17 +27,22 @@ namespace webScraper.Models
             //scrape single record
             HtmlWeb web = new HtmlWeb();
             var htmlDoc = new HtmlDocument();
-            htmlDoc = web.Load(url);
-            record.Label = GetLabel(htmlDoc);
-            record.Country = GetCountry(htmlDoc);
-            record.Released = GetReleased(htmlDoc);
-            record.Tracklist = GetTracks(htmlDoc);
-            record.Name = GetRecordTitle(htmlDoc);
-            record.Artist = GetArtist(htmlDoc);
-            record.Genre = GetGenre(htmlDoc);
-            record.Url = urlPath;
-            record.ImgUrl = GetImgUrl(htmlDoc);
-            record.PathUrl = "PathUrl"; // placeholder
+            try
+            {
+                htmlDoc = web.Load(url);
+                record.Label = GetLabel(htmlDoc);
+                record.Country = GetCountry(htmlDoc);
+                record.Released = GetReleased(htmlDoc);
+                record.Tracklist = GetTracks(htmlDoc);
+                record.Name = GetName(htmlDoc);
+                record.Artist = GetArtist(htmlDoc);
+                record.Genre = GetGenre(htmlDoc);
+                record.ImgUrl = GetImgUrl(htmlDoc);
+                record.PathUrl = "PathUrl"; // placeholder
+            }
+            catch 
+            {
+            }
         }
         private static string GetGenre(HtmlDocument htmlDoc)
         {
@@ -55,14 +63,26 @@ namespace webScraper.Models
             var profileTitleNodes = htmlDoc.DocumentNode
                 .SelectSingleNode("//*[@id=\"profile_title\"]")
                 .ChildNodes.ToList();
-            return WebUtility.HtmlDecode(profileTitleNodes[1].InnerText.Trim());
+            char[] separators = new char[] { ';', ',', '\r', '\t', '\n', '\\', '\'' };
+            string result = Regex.Escape(WebUtility.HtmlDecode(profileTitleNodes[1].InnerText.Trim()));
+            foreach (char c in separators)
+            {
+                result = result.Replace(c.ToString(), "");
+            }
+            return result.Trim();
         }
-        private static string GetRecordTitle(HtmlDocument htmlDoc)
+        private static string GetName(HtmlDocument htmlDoc)
         {
             var profileTitleNodes = htmlDoc.DocumentNode
                 .SelectSingleNode("//*[@id=\"profile_title\"]")
                 .ChildNodes.ToList();
-            return WebUtility.HtmlDecode(profileTitleNodes[profileTitleNodes.Count - 2].InnerText.Trim());
+            char[] separators = new char[] {';', ',', '\r', '\t', '\n', '\\', '\'' };
+            string result = Regex.Escape(WebUtility.HtmlDecode(profileTitleNodes[profileTitleNodes.Count - 2].InnerText.Trim()));
+            foreach (char c in separators) 
+            {
+                result = result.Replace(c.ToString(), "");
+            }
+            return result.Trim();
         }
         private static string GetLabel(HtmlDocument htmlDoc)
         {

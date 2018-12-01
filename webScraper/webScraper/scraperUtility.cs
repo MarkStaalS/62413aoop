@@ -9,8 +9,7 @@ namespace webScraper
         //Utilities for development
         public void PrintRecordInfo(Record record)
         {
-            Console.WriteLine($"url: \t\t{record.Url} \n" +
-                        $"title: \t\t{record.Name} \n" +
+            Console.WriteLine($"title: \t\t{record.Name} \n" +
                         $"artist: \t{record.Artist} \n" +
                         $"label: \t\t{record.Label} \n" +
                         $"country: \t{record.Country} \n" +
