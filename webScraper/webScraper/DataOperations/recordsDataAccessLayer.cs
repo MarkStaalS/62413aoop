@@ -131,13 +131,6 @@ namespace webScraper.DataOperations
                     }
                     catch
                     {
-                        ////Print sql query
-                        //string query = SqlCommand.CommandText;
-                        //foreach (SqlParameter p in SqlCommand.Parameters)
-                        //{
-                        //    query = query.Replace(p.ParameterName, $"'{p.Value.ToString()}'");
-                        //}
-                        //Console.WriteLine($"{query}");
                         Console.WriteLine("Error: DB Error");
                         CloseConnection();
                         return false;
