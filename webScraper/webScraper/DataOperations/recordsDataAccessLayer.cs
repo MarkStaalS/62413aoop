@@ -15,7 +15,7 @@ namespace webScraper.DataOperations
 
         private string GetConnectionString() //Uses current directory to set the path for the database
         {
-            string appConfig = Environment.CurrentDirectory; 
+            string appConfig = Environment.CurrentDirectory;
             appConfig = appConfig.Replace("\\bin\\Debug", "\\records.mdf"); //Gets directory for the database
             string connectionStringSection = ConfigurationManager.AppSettings["connectionString"]; //Gets current connectionstring with placeholder
             connectionStringSection = connectionStringSection.Replace("@ConnectionString", appConfig); //Changes placeholder to current path
@@ -38,13 +38,17 @@ namespace webScraper.DataOperations
             }
         }
         #region SQL insert
+        private delegate void Insert(Record record);
         public bool InsertRecord(Record record)
         {
             OpenConnection();
-            InsertGenre(record.Genre);
-            InsertArtist(record.Artist);
-            InsertCountry(record.Country);
-            InsertLabel(record.Label);
+            //Uses deligates to call multiple methods 
+            Insert Insert = InsertArtist;
+            Insert += InsertGenre;
+            Insert += InsertCountry;
+            Insert += InsertLabel;
+            Insert(record);
+
             //Checks weather the record exsists in the table if not, adds it
             if (!RecordExsists(record))
             {
@@ -146,8 +150,9 @@ namespace webScraper.DataOperations
                 return false;
             }
         }
-        private void InsertGenre(string genre)
+        private void InsertGenre(Record record)
         {
+            string genre = record.Genre;
             //Checks weather the genre exsists in the table if not adds it
             if (!GenreExsists(genre))
             {
@@ -167,8 +172,9 @@ namespace webScraper.DataOperations
                 }
             }
         }
-        private void InsertArtist(string artist)
+        private void InsertArtist(Record record)
         {
+            string artist = record.Artist;
             //Checks weather the artist exsists in the table if not adds it
             if (!ArtistExsists(artist))
             {
@@ -194,8 +200,9 @@ namespace webScraper.DataOperations
                 }
             }
         }
-        private void InsertCountry(string country)
+        private void InsertCountry(Record record)
         {
+            string country = record.Country;
             //Checks weather the artist exsists in the table if not adds it
             if (!CountryExsists(country))
             {
@@ -221,8 +228,9 @@ namespace webScraper.DataOperations
                 }
             }
         }
-        private void InsertLabel(string label)
+        private void InsertLabel(Record record)
         {
+            string label = record.Label;
             //Checks weather the artist exsists in the table if not adds it
             if (!LabelExsists(label))
             {

@@ -10,6 +10,7 @@ namespace webScraper.Models
     /// <summary>
     /// Class for setting and transfering record data
     /// </summary>
+    /// Implements IDisposable interface (collection of abstract members) allowing for the garbage collector to dispose of the object
     class Record : IDisposable
     {
         public string Name { get; set; }
