@@ -9,12 +9,9 @@ namespace webScraper
     {
         static void Main(string[] args)
         {
-            //args[] -How many records -Optional custom path for images
             string BaseDir = @"C:\Users\@UserName\Desktop\test\"; //folder for the images usig username
             BaseDir = BaseDir.Replace("@UserName", Environment.UserName);
             scraperUtility Utility = new scraperUtility();
-            
-
             Scraper discogsScraper = new Scraper();
 
             //User interface
@@ -23,16 +20,19 @@ namespace webScraper
 
             Console.WriteLine("Please enter command: " +
                     "\nFor additional informaiton enter 'info'");
-            while (looping){
+            while (looping)
+            {
                 string input = Console.ReadLine();
-                if (input.Contains("info")) {
-                    Console.WriteLine("dir -p \t print dir for image folder" +
-                            "\ndir -c \t change dir for image folder, this will reset current dir" +
+                if (input.Contains("info"))
+                {
+                    Console.WriteLine("\ninfo \t\t print additional information" +
+                            "\ndir - p \t print dir for image folder" +
+                            "\ndir -c \t\t change dir for image folder, this will reset current dir" +
                             "\nscrape x \t command to scrape x records" +
-                            "\nreset \t resets database and image folder" +
-                            "\nexit \t closes application");
+                            "\nreset \t\t resets database and image folder" +
+                            "\nexit \t\t closes application\n");
                 }
-                else if (input.Equals( "dir -p"))
+                else if (input.Equals("dir -p"))
                 {
                     Console.WriteLine(BaseDir);
                 }

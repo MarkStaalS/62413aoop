@@ -108,7 +108,6 @@ namespace webScraper
                 Console.WriteLine($"Next page: {urlPath} count:{ctr}");
             }
             Console.WriteLine($"Error rate {errorCtr} / {ctr}");
-            Console.ReadLine();
         }
         private static string DownloadImage(string imgUrl, string id, string BaseDirectory)
         {
