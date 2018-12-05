@@ -9,8 +9,10 @@ namespace webScraper
     {
         static void Main(string[] args)
         {
+            //property
             string BaseDir = @"C:\Users\@UserName\Desktop\test\"; //folder for the images usig username
             BaseDir = BaseDir.Replace("@UserName", Environment.UserName);
+            //Lav i objektet
             scraperUtility Utility = new scraperUtility();
             Scraper discogsScraper = new Scraper();
 

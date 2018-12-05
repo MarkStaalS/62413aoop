@@ -20,7 +20,8 @@ namespace webScraper
             string urlPath = @"/search/?type=release";//path url first page
 
             scraperUtility utility = new scraperUtility();
-            RecordsDataAccessLayer RecordsDataAccessLayer = new RecordsDataAccessLayer();
+            RecordsDataAccessLayer RecordsDataAccessLayer= new RecordsDataAccessLayer();
+          
             int ctr = 0;
             int errorCtr = 0;
             int pageCtr = 0;
