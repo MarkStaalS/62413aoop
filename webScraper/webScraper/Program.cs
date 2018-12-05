@@ -28,7 +28,7 @@ namespace webScraper
                 if (input.Contains("info"))
                 {
                     Console.WriteLine("\ninfo \t\t print additional information" +
-                            "\ndir - p \t print dir for image folder" +
+                            "\ndir -p \t print dir for image folder" +
                             "\ndir -c \t\t change dir for image folder, this will reset current dir" +
                             "\nscrape x \t command to scrape x records" +
                             "\nreset \t\t resets database and image folder" +
@@ -53,6 +53,7 @@ namespace webScraper
                 else if (input.Equals("reset"))
                 {
                     Utility.Reset(BaseDir);
+                    Console.WriteLine("Database and dir has been reset");
                 }
                 else if (input.Equals("exit"))
                 {

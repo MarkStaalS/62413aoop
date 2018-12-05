@@ -12,7 +12,6 @@ namespace webScraper
     /// </summary>
     class Scraper
     {
-        private delegate void InsertRecordIntoDB(string id, string path, Record record);
         public void GetRecords(int maxCtr, string BaseDirectory)
         {
             // scrapes website and gets record information and link to image

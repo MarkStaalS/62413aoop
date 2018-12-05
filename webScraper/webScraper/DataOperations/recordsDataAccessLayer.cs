@@ -42,16 +42,15 @@ namespace webScraper.DataOperations
         public bool InsertRecord(Record record)
         {
             OpenConnection();
-            //Uses deligates to call multiple methods 
-            Insert Insert = InsertArtist;
-            Insert += InsertGenre;
-            Insert += InsertCountry;
-            Insert += InsertLabel;
-            Insert(record);
-
             //Checks weather the record exsists in the table if not, adds it
             if (!RecordExsists(record))
             {
+                //Deligate to add relational information regarding the record
+                Insert Insert = InsertArtist;
+                Insert += InsertGenre;
+                Insert += InsertCountry;
+                Insert += InsertLabel;
+                Insert(record);
                 //Resets the autoincrementing primary key of the records table to ensure no gaps
                 string sql = "DECLARE @MaxId AS INT " +
                 "SELECT @MaxId = (SELECT TOP 1 Id FROM records ORDER BY Id DESC) " +
