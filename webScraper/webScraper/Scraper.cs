@@ -36,10 +36,9 @@ namespace webScraper
                     }
                     catch
                     {
-                        urlPath = "/search/?type=release&page=" + pageCtr;
-                        //Iterates to next page
-                        pageCtr++;
                         Console.WriteLine("Failed to load web page");
+                        urlPath = "/search/?type=release&page=" + pageCtr;
+                        pageCtr++; //Iterates to next page
                     }
                 }
                 

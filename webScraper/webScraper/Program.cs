@@ -10,11 +10,10 @@ namespace webScraper
         static void Main(string[] args)
         {
             string BaseDir = @"C:\Users\" + Environment.UserName + @"\Desktop\test\"; //folder for the images usig username
-            //BaseDir = BaseDir.Replace("@UserName", Environment.UserName);
-
-            //User interface
             int x = 0;
             bool looping = true;
+
+            //User interface
             Console.WriteLine("Please enter command: " +
                     "\nFor additional informaiton enter 'info'");
             while (looping)

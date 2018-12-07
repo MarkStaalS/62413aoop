@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net;
 
 namespace webScraper.Models
@@ -6,12 +7,13 @@ namespace webScraper.Models
     /// <summary>
     /// A class containing the relevant information regarding a single track and a method to set these
     /// </summary>
-    class Track
+    class Track : IDisposable
     {
         public string Number { get; set; }
         public string Name { get; set; }
         public string Duration { get; set; }
         public int RecordId { get; set; }
+
         public void SetTrack(HtmlAgilityPack.HtmlNode htmlNode)
         {
             var trackInfo = htmlNode.ChildNodes.Where(node => node.GetAttributeValue("class", "")
@@ -19,6 +21,9 @@ namespace webScraper.Models
             Number = trackInfo[0].InnerText.ToString(); //needs to be string
             Name = WebUtility.HtmlDecode(trackInfo[trackInfo.Count - 2].InnerText.ToString());
             Duration = trackInfo[trackInfo.Count - 1].InnerText.ToString().Trim();
+        }
+        public void Dispose()
+        {
         }
     }
 }

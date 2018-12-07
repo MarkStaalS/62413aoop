@@ -7,7 +7,7 @@ using System;
 namespace webScraper.DataOperations
 {
     /// <summary>
-    /// Provides a interface for inserting records into the database.
+    /// Provides a interface for inserting and updating records in the database.
     /// </summary>
     class RecordsDataAccessLayer
     {
