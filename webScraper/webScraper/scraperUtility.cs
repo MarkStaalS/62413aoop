@@ -4,7 +4,7 @@ using webScraper.DataOperations;
 
 namespace webScraper
 {
-    class scraperUtility
+    class ScraperUtility : IDisposable
     {
         //Utilities for development
         public void PrintRecordInfo(Record record)
@@ -43,6 +43,10 @@ namespace webScraper
             catch
             {
             }
+        }
+
+        public void Dispose()
+        {
         }
     }
 }

@@ -7,21 +7,21 @@ using System;
 namespace webScraper.DataOperations
 {
     /// <summary>
-    /// Provides a interface for inserting records into the database
+    /// Provides a interface for inserting records into the database.
     /// </summary>
     class RecordsDataAccessLayer
     {
         private SqlConnection _SqlConnection = null;
 
-        private string GetConnectionString() //Uses current directory to set the path for the database
+        private string GetConnectionString() //Uses current directory to set the path for the database in the App.config file
         {
-            string appConfig = Environment.CurrentDirectory;
+            string appConfig = Environment.CurrentDirectory; //Get current directory
             appConfig = appConfig.Replace("\\bin\\Debug", "\\records.mdf"); //Gets directory for the database
             string connectionStringSection = ConfigurationManager.AppSettings["connectionString"]; //Gets current connectionstring with placeholder
             connectionStringSection = connectionStringSection.Replace("@ConnectionString", appConfig); //Changes placeholder to current path
             return connectionStringSection;
         }
-        //Reference book pro C# 7 ...
+        //OpenConnection and CloseConnection methods, source: A. Troelsen, P Japikse, Pro C# 7, Mínnesota, 2017,p 383
         private void OpenConnection()
         {
             _SqlConnection = new SqlConnection()
@@ -67,6 +67,7 @@ namespace webScraper.DataOperations
                 "(@name, @artist, @genre, @pathUrl, @country, @label, @released)";
                 using (SqlCommand SqlCommand = new SqlCommand(sql, _SqlConnection))
                 {
+                    //Sql Parameters
                     SqlParameter Parameter = new SqlParameter
                     {
                         ParameterName = "@name",

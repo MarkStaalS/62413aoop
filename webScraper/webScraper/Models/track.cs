@@ -4,7 +4,7 @@ using System.Net;
 namespace webScraper.Models
 {
     /// <summary>
-    /// A class containing the relevant information regarding a single track
+    /// A class containing the relevant information regarding a single track and a method to set these
     /// </summary>
     class Track
     {

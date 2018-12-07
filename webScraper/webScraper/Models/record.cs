@@ -23,9 +23,9 @@ namespace webScraper.Models
         public string Released { get; set; }
         public List<Track> Tracklist { get; set; }
 
+        //scrape single record
         public void SetRecord(string url, string urlPath, Record record)
         {
-            //scrape single record
             HtmlWeb web = new HtmlWeb();
             var htmlDoc = new HtmlDocument();
             try
@@ -64,8 +64,9 @@ namespace webScraper.Models
             var profileTitleNodes = htmlDoc.DocumentNode
                 .SelectSingleNode("//*[@id=\"profile_title\"]")
                 .ChildNodes.ToList();
-            char[] separators = new char[] { ';', ',', '\r', '\t', '\n', '\\', '\'' };
+            char[] separators = new char[] { ';', ',', '\r', '\t', '\n', '\\', '\'' };//unwanted characters
             string result = Regex.Escape(WebUtility.HtmlDecode(profileTitleNodes[1].InnerText.Trim()));
+            //Run through escaped string removing unwanted characters
             foreach (char c in separators)
             {
                 result = result.Replace(c.ToString(), "");
@@ -77,8 +78,9 @@ namespace webScraper.Models
             var profileTitleNodes = htmlDoc.DocumentNode
                 .SelectSingleNode("//*[@id=\"profile_title\"]")
                 .ChildNodes.ToList();
-            char[] separators = new char[] {';', ',', '\r', '\t', '\n', '\\', '\'' };
+            char[] separators = new char[] {';', ',', '\r', '\t', '\n', '\\', '\'' };//unwanted characters
             string result = Regex.Escape(WebUtility.HtmlDecode(profileTitleNodes[profileTitleNodes.Count - 2].InnerText.Trim()));
+            //Run through escaped string removing unwanted characters
             foreach (char c in separators) 
             {
                 result = result.Replace(c.ToString(), "");
@@ -135,7 +137,6 @@ namespace webScraper.Models
         //IDisposable Interface
         public void Dispose()
         {
-
         }
     }
 }
