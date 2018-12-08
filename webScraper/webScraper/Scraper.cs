@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using webScraper.DataOperations;
@@ -19,8 +20,9 @@ namespace webScraper
             string urlPath = @"/search/?type=release";//path url first page
             int ctr = 0;
             int pageCtr = 0;
-
+            Stopwatch stopwatch = new Stopwatch();
             RecordsDataAccessLayer RecordsDataAccessLayer= new RecordsDataAccessLayer();
+            stopwatch.Start();
             while (ctr < maxCtr)
             {
                 HtmlWeb web = new HtmlWeb();
@@ -97,7 +99,8 @@ namespace webScraper
                 urlPath = GetNextPage(htmlDoc);
                 pageCtr++; //used if unabel to get page (to iterate to next page)
             }
-            Console.WriteLine($"Done, records scraped: {ctr}");
+            stopwatch.Stop();
+            Console.WriteLine($"Done, records scraped: {ctr}, Time elapsed: {stopwatch.Elapsed}");
         }
         //Using web client to download album cover to specified folder
         private static string DownloadImage(string imgUrl, string id, string BaseDirectory)
