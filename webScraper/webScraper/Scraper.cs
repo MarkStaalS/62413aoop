@@ -88,7 +88,7 @@ namespace webScraper
                                 RecordsDataAccessLayer.InsertTrackList(id, Record); //All tracks of the record will be inserted into the database
                                 ctr++;
                                 //notifies the user thet the record has been successfully added to the database
-                                Console.WriteLine("Success: " + Record.Name);
+                                Console.WriteLine($"Success: {Record.Name} - {Record.Artist}");
                             }
                         }
                     }
@@ -97,6 +97,7 @@ namespace webScraper
                 urlPath = GetNextPage(htmlDoc);
                 pageCtr++; //used if unabel to get page (to iterate to next page)
             }
+            Console.WriteLine($"Done, records scraped: {ctr}");
         }
         //Using web client to download album cover to specified folder
         private static string DownloadImage(string imgUrl, string id, string BaseDirectory)
@@ -111,7 +112,7 @@ namespace webScraper
                 }
                 catch (System.ArgumentException)
                 {
-                    Console.WriteLine("There was an error downloading a cover.");
+                    Console.WriteLine("Error: Downloading cover.");
                     return null;
                 }
             }

@@ -64,27 +64,33 @@ namespace webScraper.Models
             var profileTitleNodes = htmlDoc.DocumentNode
                 .SelectSingleNode("//*[@id=\"profile_title\"]")
                 .ChildNodes.ToList();
+            //Clean result
             char[] separators = new char[] { ';', ',', '\r', '\t', '\n', '\\', '\'' };//unwanted characters
             string result = Regex.Escape(WebUtility.HtmlDecode(profileTitleNodes[1].InnerText.Trim()));
+            result = result.Replace(@"n\", "");
             //Run through escaped string removing unwanted characters
             foreach (char c in separators)
             {
                 result = result.Replace(c.ToString(), "");
             }
-            return result.Trim();
+            result = result.Replace("  ", "");
+            return result;
         }
         private static string GetName(HtmlDocument htmlDoc)
         {
             var profileTitleNodes = htmlDoc.DocumentNode
                 .SelectSingleNode("//*[@id=\"profile_title\"]")
                 .ChildNodes.ToList();
+            //Clean result
             char[] separators = new char[] {';', ',', '\r', '\t', '\n', '\\', '\'' };//unwanted characters
             string result = Regex.Escape(WebUtility.HtmlDecode(profileTitleNodes[profileTitleNodes.Count - 2].InnerText.Trim()));
+            result = result.Replace(@"n\", "");
             //Run through escaped string removing unwanted characters
             foreach (char c in separators) 
             {
                 result = result.Replace(c.ToString(), "");
             }
+            result = result.Replace("  ", "");
             return result.Trim();
         }
         private static string GetLabel(HtmlDocument htmlDoc)
