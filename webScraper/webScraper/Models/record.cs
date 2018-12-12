@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 namespace webScraper.Models
 {
     /// <summary>
-    /// Class for setting and transfering record data
+    /// Class for setting and transferring  ring record data
     /// </summary>
     /// Implements IDisposable interface (collection of abstract members) allowing for the garbage collector to dispose of the object
     class Record : IDisposable
@@ -22,8 +22,7 @@ namespace webScraper.Models
         public string Label { get; set; }
         public string Released { get; set; }
         public List<Track> Tracklist { get; set; }
-
-        //scrape single record
+        //Scrape single record
         public void SetRecord(string url, string urlPath, Record record)
         {
             HtmlWeb web = new HtmlWeb();
@@ -39,7 +38,7 @@ namespace webScraper.Models
                 record.Artist = GetArtist(htmlDoc);
                 record.Genre = GetGenre(htmlDoc);
                 record.ImgUrl = GetImgUrl(htmlDoc);
-                record.PathUrl = "PathUrl"; // placeholder
+                record.PathUrl = "Placeholder"; 
             }
             catch 
             {
@@ -64,12 +63,12 @@ namespace webScraper.Models
             var profileTitleNodes = htmlDoc.DocumentNode
                 .SelectSingleNode("//*[@id=\"profile_title\"]")
                 .ChildNodes.ToList();
-            //Clean result
-            char[] separators = new char[] { ';', ',', '\r', '\t', '\n', '\\', '\'' };//unwanted characters
+            //Clean string(result)
+            char[] UnwantedCharacters = new char[] { ';', ',', '\r', '\t', '\n', '\\', '\'' };
             string result = Regex.Escape(WebUtility.HtmlDecode(profileTitleNodes[1].InnerText.Trim()));
             result = result.Replace(@"n\", "");
             //Run through escaped string removing unwanted characters
-            foreach (char c in separators)
+            foreach (char c in UnwantedCharacters)
             {
                 result = result.Replace(c.ToString(), "");
             }
@@ -81,12 +80,12 @@ namespace webScraper.Models
             var profileTitleNodes = htmlDoc.DocumentNode
                 .SelectSingleNode("//*[@id=\"profile_title\"]")
                 .ChildNodes.ToList();
-            //Clean result
-            char[] separators = new char[] {';', ',', '\r', '\t', '\n', '\\', '\'' };//unwanted characters
+            //Clean string(result)
+            char[] UnwantedCharacters = new char[] {';', ',', '\r', '\t', '\n', '\\', '\'' };
             string result = Regex.Escape(WebUtility.HtmlDecode(profileTitleNodes[profileTitleNodes.Count - 2].InnerText.Trim()));
             result = result.Replace(@"n\", "");
             //Run through escaped string removing unwanted characters
-            foreach (char c in separators) 
+            foreach (char c in UnwantedCharacters) 
             {
                 result = result.Replace(c.ToString(), "");
             }
@@ -125,9 +124,9 @@ namespace webScraper.Models
                 return "-";
             }
         }
+        //Get tracks from the Html document and returns them in a list
         private static List<Track> GetTracks(HtmlDocument htmlDoc)
         {
-            //Get tracks from the record and returns them in a list
             List<Track> trackList = new List<Track>();
             var htmlTrackList = htmlDoc.DocumentNode.Descendants("tr")
                 .Where(node => node.GetAttributeValue("class", "")
@@ -140,7 +139,6 @@ namespace webScraper.Models
             }
             return trackList;
         }
-        //IDisposable Interface
         public void Dispose()
         {
         }

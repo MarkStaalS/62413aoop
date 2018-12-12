@@ -6,7 +6,6 @@ namespace webScraper
 {
     class ScraperUtility : IDisposable
     {
-        //Utilities for development
         public void PrintRecordInfo(Record record)
         {
             Console.WriteLine($"title: \t\t{record.Name} \n" +
@@ -30,7 +29,7 @@ namespace webScraper
         }
         public void CreateDir(string BaseDirectory)
         {
-            System.IO.Directory.CreateDirectory(BaseDirectory); // Creates directory if it not already exists.
+            System.IO.Directory.CreateDirectory(BaseDirectory); //Creates directory if one does not already exist.
         }
         public void Reset(string BaseDirrectory)
         {
@@ -38,13 +37,12 @@ namespace webScraper
             recordsDataAccessLayer.ResetDatabase();
             try
             {
-                System.IO.Directory.Delete(BaseDirrectory, true); // Deletes directory
+                System.IO.Directory.Delete(BaseDirrectory, true); //Deletes directory
             }
             catch
             {
             }
         }
-
         public void Dispose()
         {
         }

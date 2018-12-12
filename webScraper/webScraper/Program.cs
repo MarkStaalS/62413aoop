@@ -9,11 +9,16 @@ namespace webScraper
     {
         static void Main(string[] args)
         {
-            string BaseDir = @"C:\Users\" + Environment.UserName + @"\Desktop\test\"; //folder for the images usig username
+            UI UserInterface = new UI();
+            UserInterface.Run(@"C:\Users\" + Environment.UserName + @"\Desktop\test\"); //Folder for the images, using username
+        }
+    }
+    class UI
+    {
+        public void Run(string BaseDir)
+        {
             int x = 0;
             bool looping = true;
-
-            //User interface
             Console.WriteLine("Please enter command: " +
                     "\nFor additional informaiton enter 'info'");
             while (looping)

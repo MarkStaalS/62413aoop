@@ -9,15 +9,15 @@ using webScraper.Models;
 namespace webScraper
 {
     /// <summary>
-    /// Class that scrapes the required amount of records from discogs.com, adds them to a database and downloads the albumcover if present to a specified directory.
+    /// Class that scrapes the specified amount of records from discogs.com, adds them to a database and downloads the album cover if present to a specified directory.
     /// </summary>
     class Scraper : IDisposable
     {
         public void GetRecords(int maxCtr, string BaseDirectory)
         {
-            // scrapes website and gets record information and link to image
+            //Scrapes website and gets record information and album cover 
             string url = @"https://www.discogs.com"; //Base url
-            string urlPath = @"/search/?type=release";//path url first page
+            string urlPath = @"/search/?type=release";//Fath url, first page
             int ctr = 0;
             int pageCtr = 0;
             Stopwatch stopwatch = new Stopwatch();
@@ -27,8 +27,8 @@ namespace webScraper
             {
                 HtmlWeb web = new HtmlWeb();
                 HtmlDocument htmlDoc = new HtmlDocument();
-                //Handels failed loading of pages
-                //Will loop until loading of page successfull
+                //Handles failed loading of pages
+                //Infinite loop until loading of page successful
                 for (; ; )
                 {
                     try
@@ -44,25 +44,25 @@ namespace webScraper
                     }
                 }
                 
-                //Lambda functions used together with LINQ query, taking the Html node as input and returning in this case a list
-                var recordList = htmlDoc.DocumentNode.Descendants("div") //Html attributes containing list of records
+                //Lambda functions used together with LINQ query, taking the Html node as input and returning a list of records
+                var recordList = htmlDoc.DocumentNode.Descendants("div")
                     .Where(node => node.GetAttributeValue("id", "")
                     .Equals("search_results")).ToList();
 
                 var listItems = recordList[0].Descendants("a") //List of record links
                     .Where(node => node.GetAttributeValue("class", "")
                     .Equals("search_result_title")).ToList();
-                //Loops through every item in the list, coresponding with the records on a single web page
+                //Loops through every item in the list, corresponding with the records on a single web page
                 foreach (var listItem in listItems)
                 {
-                    //Checks that only the specified ammount of records will be scraped
+                    //Checks that only the specified amount of records will be scraped
                     if (ctr >= maxCtr)
                         break;
                     string recordUrlPath = listItem.GetAttributeValue("href", "").ToString(); //url to record page
 
                     using (Record Record = new Record())
                     {
-                        //Call SetRecord to fill the record object with required informaiton
+                        //Call SetRecord to fill the record object with required information
                         Record.SetRecord(url + recordUrlPath, recordUrlPath, Record);
                         //If the record genre is empty the record will not be entered into the database
                         if (Record.Genre == null)
@@ -71,7 +71,7 @@ namespace webScraper
                         }
                         else
                         {
-                            //Checks weather or not the record has been added and weather to download cover image
+                            //Checks weather or not the record has been added and weather to download album cover
                             if (RecordsDataAccessLayer.InsertRecord(Record))
                             {
                                 string id = RecordsDataAccessLayer.GetLatestId();
@@ -83,21 +83,20 @@ namespace webScraper
                                 }
                                 else
                                 {
-                                    //If the record dose not use a stock image the image will be downloaded to the specified folder
+                                    //If the record does not use a stock image the image will be downloaded to the specified folder
                                     path = DownloadImage(Record.ImgUrl, id, BaseDirectory);
                                 }
-                                RecordsDataAccessLayer.UpdateRecordPtah(id, path); //Update file path
+                                RecordsDataAccessLayer.UpdateRecordPtah(id, path); //Update file path to album cover
                                 RecordsDataAccessLayer.InsertTrackList(id, Record); //All tracks of the record will be inserted into the database
                                 ctr++;
-                                //notifies the user thet the record has been successfully added to the database
+                                //Notifies the user that the record has been successfully added to the database
                                 Console.WriteLine($"Success: {Record.Name} - {Record.Artist}");
                             }
                         }
                     }
                 }
-                //Get url path for the next page
                 urlPath = GetNextPage(htmlDoc);
-                pageCtr++; //used if unabel to get page (to iterate to next page)
+                pageCtr++; //Used if unable to get page (to iterate to next page)
             }
             stopwatch.Stop();
             Console.WriteLine($"Done, records scraped: {ctr}, Time elapsed: {stopwatch.Elapsed}");
@@ -121,14 +120,13 @@ namespace webScraper
             }
 
         }
-        //Get url path for the next page
+        //Get url for the next page
         private static string GetNextPage(HtmlDocument htmlDoc)
         {
             return htmlDoc.DocumentNode
                     .SelectSingleNode("//*[@id=\"pjax_container\"]/div[3]/form/div[1]/ul/li[2]/a")
                     .GetAttributeValue("href", "");
         }
-
         public void Dispose()
         {
         }

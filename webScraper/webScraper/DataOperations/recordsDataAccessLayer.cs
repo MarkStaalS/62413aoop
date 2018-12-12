@@ -7,7 +7,7 @@ using System;
 namespace webScraper.DataOperations
 {
     /// <summary>
-    /// Provides a interface for inserting and updating records in the database.
+    /// Provides an interface for inserting and updating records in the database. As well as clearing the database tables 
     /// </summary>
     class RecordsDataAccessLayer
     {
@@ -17,11 +17,11 @@ namespace webScraper.DataOperations
         {
             string appConfig = Environment.CurrentDirectory; //Get current directory
             appConfig = appConfig.Replace("\\bin\\Debug", "\\records.mdf"); //Gets directory for the database
-            string connectionStringSection = ConfigurationManager.AppSettings["connectionString"]; //Gets current connectionstring with placeholder
+            string connectionStringSection = ConfigurationManager.AppSettings["connectionString"]; //Gets current connectionString containing a placeholder
             connectionStringSection = connectionStringSection.Replace("@ConnectionString", appConfig); //Changes placeholder to current path
             return connectionStringSection;
         }
-        //OpenConnection and CloseConnection methods, source: A. Troelsen, P Japikse, Pro C# 7, Mínnesota, 2017,p 383
+        //OpenConnection and CloseConnection methods. Source: A. Troelsen, P Japikse, Pro C# 7, Mínnesota, 2017,p 383
         private void OpenConnection()
         {
             _SqlConnection = new SqlConnection()
@@ -42,10 +42,10 @@ namespace webScraper.DataOperations
         public bool InsertRecord(Record record)
         {
             OpenConnection();
-            //Checks weather the record exsists in the table if not, adds it
+            //Checks weather the record exists in the table if not, adds it
             if (!RecordExsists(record))
             {
-                //Deligate to add relational information regarding the record
+                //Delegate to add relational information regarding the record
                 Insert Insert = InsertArtist;
                 Insert += InsertGenre;
                 Insert += InsertCountry;
@@ -67,7 +67,6 @@ namespace webScraper.DataOperations
                 "(@name, @artist, @genre, @pathUrl, @country, @label, @released)";
                 using (SqlCommand SqlCommand = new SqlCommand(sql, _SqlConnection))
                 {
-                    //Sql Parameters
                     SqlParameter Parameter = new SqlParameter
                     {
                         ParameterName = "@name",
@@ -146,7 +145,7 @@ namespace webScraper.DataOperations
         private void InsertGenre(Record record)
         {
             string genre = record.Genre;
-            //Checks weather the genre exsists in the table if not adds it
+            //Checks weather the genre exists in the table if not adds it
             if (!GenreExsists(genre))
             {
                 string sql = "INSERT INTO genre" +
@@ -168,7 +167,7 @@ namespace webScraper.DataOperations
         private void InsertArtist(Record record)
         {
             string artist = record.Artist;
-            //Checks weather the artist exsists in the table if not adds it
+            //Checks weather the artist exists in the table if not adds it
             if (!ArtistExsists(artist))
             {
                 string sql = "INSERT INTO artists" +
@@ -196,7 +195,7 @@ namespace webScraper.DataOperations
         private void InsertCountry(Record record)
         {
             string country = record.Country;
-            //Checks weather the artist exsists in the table if not adds it
+            //Checks weather the artist exists in the table if not adds it
             if (!CountryExsists(country))
             {
                 string sql = "INSERT INTO country" +
@@ -224,7 +223,7 @@ namespace webScraper.DataOperations
         private void InsertLabel(Record record)
         {
             string label = record.Label;
-            //Checks weather the artist exsists in the table if not adds it
+            //Checks weather the artist exists in the table if not adds it
             if (!LabelExsists(label))
             {
                 string sql = "INSERT INTO label" +
@@ -480,7 +479,7 @@ namespace webScraper.DataOperations
         #region SQL update
         public void UpdateRecordPtah(string Id, string RecordPath)
         {
-            //Checks weather the artist exsists in the table if not adds it
+            //Checks weather the artist exists in the table if not adds it
             string sql;
             OpenConnection();
             sql = "UPDATE records SET pathUrl = @RecordPath WHERE Id = @Id";
@@ -518,7 +517,7 @@ namespace webScraper.DataOperations
         public void ResetDatabase()
         {
             OpenConnection();
-            string sql = "DELETE FROM tracks"; //needs to be before records because this uses records as forgin key
+            string sql = "DELETE FROM tracks";
             using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
             {
                 cmd.CommandType = CommandType.Text;
@@ -531,7 +530,6 @@ namespace webScraper.DataOperations
                 cmd.CommandType = CommandType.Text;
                 cmd.ExecuteNonQuery();
             }
-            //Deletes rows from tables
             sql = "DELETE FROM records";
             using (SqlCommand cmd = new SqlCommand(sql, _SqlConnection))
             {
